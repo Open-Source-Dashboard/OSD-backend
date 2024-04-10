@@ -1,7 +1,10 @@
+# Project: Open Source Dashboard
 
-Project: Open Source Dashboard
+Authors: Tammy Do, Andrea Riley(Thiel), Lana Zumbrunn
 
-Author: Tammy Do, Andrea Riley(Thiel), Lana Zumbrunn
+## Feature Tasks
+
+## Change Log
 
 ## Links and Resources
 
