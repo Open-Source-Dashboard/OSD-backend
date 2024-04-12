@@ -1,6 +1,6 @@
 # Project: Open Source Dashboard
 
-Authors: Tammy Do, Andrea Riley(Thiel), Lana Zumbrunn
+Authors: Tammy Do, Andrea Riley(Thiel), Lana Zumbrunn, Caleb Hemphill
 
 ## Feature Tasks
 
