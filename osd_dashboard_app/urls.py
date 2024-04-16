@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
+from osd_dashboard_app.views import GitHubRepositoriesView
 
 urlpatterns = [
-  path("/", views.say_hello, name="say_hello")
-  # path('osd_dashboard_app/github', views.say_hello)
+  path('repositories/', GitHubRepositoriesView.as_view()),
 ]
