@@ -4,6 +4,7 @@ ENV/
 .idea
 .DS_Store
 .history
+open-source-dashboard.2024-04-12.private-key (1).pem
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
