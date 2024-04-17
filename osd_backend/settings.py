@@ -55,7 +55,8 @@ ROOT_URLCONF = 'osd_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+           '/osd_dashboard_app/templates/' ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

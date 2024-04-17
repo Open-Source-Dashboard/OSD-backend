@@ -6,22 +6,21 @@ import requests
 from datetime import datetime, timedelta
 
 
-
 class GitHubRepositoriesView(View):
-     # Sample  for testing:  # Sample  for testing: https://api.github.com/search/repositories?q=topic:opensource%20pushed:%3E2024-04-14
+    # Sample  for testing:  # Sample  for testing: https://api.github.com/search/repositories?q=topic:opensource%20pushed:%3E2024-04-14
     def get(self, request):
         """A class-based view for retrieving GitHub repositories.
 
         This class extends the Django `View` class and provides a `get` method to handle HTTP GET requests. It retrieves the top open-source repositories on GitHub that were pushed within the last 24 hours and sorts them by the number of stars in descending order.
         """
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        yesterday = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = "https://api.github.com/search/repositories"
         params = {
-            "q": f"topic:opensource pushed:>{yesterday}",
+            "q": f"topic:opensource hacktoberfest pushed:>{yesterday}",
             "sort": "stars",
             "order": "desc"
         }
-        
+
         try:
             response = requests.get(url, params=params)
             response.raise_for_status()
@@ -32,7 +31,9 @@ class GitHubRepositoriesView(View):
         # user these variables later: license, avatar_url, and url. Maybe topics.
         repositories = prioritize_hacktoberfest_repos(repositories)
         for repo in repositories:
-            licence = repo.get('license', {}).get('name', 'N/A')
+            if repo is None:
+                print("Encountered a None value in the repositories list.")
+            licence = repo.get('license', "no license")
             avatar_url = repo['owner']['avatar_url']
             url = repo['html_url']
             commits_url = repo['commits_url'].replace("{/sha}", "")
@@ -46,7 +47,9 @@ class GitHubRepositoriesView(View):
                 'latest_commit_timestamp': latest_commit_timestamp,
                 'latest_committer': latest_committer
             }) 
-            return HttpResponse("GitHub repositories fetched successfully", status=200)
+            print(repo)
+        return render(request, 'repositories.html', {'repositories': repositories}) 
+        # return HttpResponse("GitHub repositories fetched successfully", status=200, repositories=repositories)
 def prioritize_hacktoberfest_repos(repositories):
     """Prioritize Hacktoberfest repositories.
 
@@ -97,7 +100,5 @@ def get_commit_info(commits_url):
      # response = requests.get('https://api.github.com/search/repositories?q=topic:opensource%20pushed:%3E2024-04-14')
 
 
-
-
 # elif 'hacktoberfest' in repo['topics'] and repo['pushed_at'] >= (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%dT%H:%M:%SZ"):
-        # hacktoberfest_repos.append(repo)
+# hacktoberfest_repos.append(repo)

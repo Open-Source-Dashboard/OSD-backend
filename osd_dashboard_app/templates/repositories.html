@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Repositories{% endblock %}
+
+{% block content %}
+    <h1>Repositories</h1>
+    <ul>
+        {% for repo in repositories %}
+            <li>{{ repo.name }}</li>
+            <li>{{ repo.description }}</li>
+            <li>{{ repo.language }}</li>
+            <li>{{ repo.topics }}</li>
+            <li>{{ repo.license }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
