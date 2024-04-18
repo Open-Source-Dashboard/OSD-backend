@@ -34,7 +34,6 @@ class GitHubRepositoriesView(View):
             if repo is None:
                 print("Encountered a None value in the repositories list.")
             licence = repo.get("license", "no license")
-            licence = repo.get('license', {}).get('name', 'N/A')
             avatar_url = repo['owner']['avatar_url']
             url = repo['html_url']
             commits_url = repo['commits_url'].replace("{/sha}", "")
@@ -49,7 +48,7 @@ class GitHubRepositoriesView(View):
                 'latest_committer': latest_committer
             }) 
             print(repo)
-        return render(request, 'repositories.hmtl', {'repositories': repositories})
+        return render(request, 'repositories.html', {'repositories': repositories})
 
         # return HttpResponse("GitHub repositories fetched successfully", status=200, repositories=repositories)
 def prioritize_hacktoberfest_repos(repositories):

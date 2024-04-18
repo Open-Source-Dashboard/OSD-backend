@@ -56,8 +56,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            '/osd_dashboard_app/templates/' 
-        ],
+            '/osd_dashboard_app/templates/' ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
