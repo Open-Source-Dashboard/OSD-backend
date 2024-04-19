@@ -7,12 +7,11 @@
 <ul>
     {% for repo in repositories %}
 
-    <li><b>{{ repo.name }}</b></li>
-    <li>Description: {{ repo.description }}</li>
-    <li>Languages: {{ repo.language }}</li>
-    <li>Topics: {{ repo.topics }}</li>
-    <li>License: {{ repo.license }}</li>
-    <li></li>
+    <li>{{ repo.name }}</li>
+    <li>{{ repo.description }}</li>
+    <li>{{ repo.language }}</li>
+    <li>{{ repo.topics }}</li>
+    <li>{{ repo.license }}</li>\
 
     {% endfor %}
 </ul>

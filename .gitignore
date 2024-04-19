@@ -94,7 +94,4 @@ venv.bak/
 node_modules/
 .next/
 # poetry
-poetry.
-
-#sample data
-sample_commit_response.json
+poetry.lock
