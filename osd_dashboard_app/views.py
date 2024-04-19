@@ -123,14 +123,13 @@ def latest_contributors(repos):
   for url in last_commits_url_from_each_repo:
     commits_response = requests.get(url)
     commits_response_json = commits_response.json()
-    
-    if commits_response_json[0]:
-      latest_commit_author = commits_response_json[0]['author']['login']
 
-      latest_commit_authors.append(latest_commit_author)
+    if commits_response_json:
+        latest_commit_author = commits_response_json[0].get('author', {}).get('login')
+        if latest_commit_author:
+            latest_commit_authors.append(latest_commit_author)
 
   for url in last_commits_url_from_each_repo:
-    if url:
       repo_name = url.split('/')[-2]
       latest_repo_names.append(repo_name)
 
@@ -138,4 +137,5 @@ def latest_contributors(repos):
   print('\n')
   print('latest_repo_names', latest_repo_names)
 
+  print('zipped users and repos', zip(latest_commit_authors, latest_repo_names))
   return zip(latest_commit_authors, latest_repo_names)
