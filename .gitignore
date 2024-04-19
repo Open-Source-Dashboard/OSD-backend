@@ -95,3 +95,6 @@ node_modules/
 .next/
 # poetry
 poetry.lock
+
+# Sample data
+sample_json/
