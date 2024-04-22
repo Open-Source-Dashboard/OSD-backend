@@ -98,3 +98,5 @@ poetry.lock
 
 # Sample data
 sample_json/
+
+get_jwt.py

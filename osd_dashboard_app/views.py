@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.views import View
 import requests
 from datetime import datetime, timedelta
-
+import random
 
 class GitHubRepositoriesView(View):
     # All repo data filtered by opensource and hacktoberfest
@@ -17,7 +17,8 @@ class GitHubRepositoriesView(View):
         url = "https://api.github.com/search/repositories"
         params = {
             "q": f"topic:opensource hacktoberfest pushed:>{last_month}",
-            "order": "desc"
+            "order": "desc",
+            "limit": 20
         }
 
         try:
@@ -48,9 +49,12 @@ class GitHubRepositoriesView(View):
                 'commits_url': commits_url
             }) 
         popular_projects_result = popular_projects(repositories)
-        latest_contributors_result = latest_contributors(repositories)
-
+        # featured_project_result = featured_project(popular_projects_result)
+        # latest_contributors_result = latest_contributors(repositories)
+        latest_contributors(repositories)
         return render(request, 'repositories.html', {'repositories': repositories})
+
+        # return render(request, 'repositories.html', {'latest_contributors_result': latest_contributors_result[0], 'popular_projects_result': popular_projects_result}) {'featured_project_result': featured_project_result})
 
 def prioritize_hacktoberfest_repos(repositories):
     """Prioritize Hacktoberfest repositories.
@@ -101,11 +105,17 @@ def popular_projects(repos):
   randomized_repos = []
  
   for repo in repos:
-    if not repo['full_name']  in randomized_repos:
+    if not repo['full_name'] in randomized_repos:
         randomized_repos.append(repo)
   
   return randomized_repos
-        
+# add randomizer(maybe?)
+
+# def featured_project(repos):
+    # random_repo_index = random.randint(0, len(repos) - 1)
+    # random_repo_result = repos[random_repo_index]
+    # return random_repo_result 
+
 # Get a list of latest contributors
 def latest_contributors(repos):
   calc_12_hours = (datetime.now() - timedelta(hours=12)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -121,6 +131,7 @@ def latest_contributors(repos):
 
 
   for url in last_commits_url_from_each_repo:
+    print(url)
     commits_response = requests.get(url)
     commits_response_json = commits_response.json()
 
@@ -129,13 +140,14 @@ def latest_contributors(repos):
         if latest_commit_author:
             latest_commit_authors.append(latest_commit_author)
 
-  for url in last_commits_url_from_each_repo:
-      repo_name = url.split('/')[-2]
-      latest_repo_names.append(repo_name)
+#   for url in last_commits_url_from_each_repo:
+#       repo_name = url.split('/')[-2]
+#       latest_repo_names.append(repo_name)
 
-  print('latest_commit_author', latest_commit_authors)
-  print('\n')
-  print('latest_repo_names', latest_repo_names)
+#   print('latest_commit_author', latest_commit_authors)
+#   print('\n')
+#   print('latest_repo_names', latest_repo_names)
 
-  print('zipped users and repos', zip(latest_commit_authors, latest_repo_names))
-  return zip(latest_commit_authors, latest_repo_names)
+#   print('zipped users and repos', zip(latest_commit_authors, latest_repo_names))
+#   # return list(zip(latest_commit_authors, latest_repo_names))
+#   return [latest_commit_authors, latest_repo_names]
