@@ -8,11 +8,11 @@ import random
 
 class GitHubRepositoriesView(View):
     # All repo data filtered by opensource and hacktoberfest
-    def get(self, request):
-        """A class-based view for retrieving GitHub repositories.
+    """A class-based view for retrieving GitHub repositories.
 
-        This class extends the Django `View` class and provides a `get` method to handle HTTP GET requests. It retrieves the top open-source repositories on GitHub that were pushed within the last 24 hours and sorts them by the number of stars in descending order.
-        """
+    This class extends the Django `View` class and provides a `get` method to handle HTTP GET requests. It retrieves the top open-source repositories on GitHub that were pushed within the last 30 days and sorts them by the number of stars in descending order.
+    """
+    def get(self, request):
         last_month = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = "https://api.github.com/search/repositories"
         params = {
@@ -28,7 +28,7 @@ class GitHubRepositoriesView(View):
         except requests.exceptions.RequestException as e:
             print(f"Failed to fetch GitHub repositories: {e}")
             return HttpResponse("Failed to fetch GitHub repositories", status=500)
-        
+
         repositories = prioritize_hacktoberfest_repos(repositories)
 
         for repo in repositories:
@@ -105,16 +105,16 @@ def popular_projects(repos):
   randomized_repos = []
  
   for repo in repos:
-    if not repo['full_name'] in randomized_repos:
+    if not repo['name'] in randomized_repos:
         randomized_repos.append(repo)
   
   return randomized_repos
 # add randomizer(maybe?)
 
 # def featured_project(repos):
-    # random_repo_index = random.randint(0, len(repos) - 1)
-    # random_repo_result = repos[random_repo_index]
-    # return random_repo_result 
+# random_repo_index = random.randint(0, len(repos) - 1)
+# random_repo_result = repos[random_repo_index]
+# return random_repo_result
 
 # Get a list of latest contributors
 def latest_contributors(repos):

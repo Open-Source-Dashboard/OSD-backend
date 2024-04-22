@@ -1,0 +1,56 @@
+[
+    {
+        "model": "osd_dashboard_app.githubrepo",
+        "pk": 1,
+        "fields": {
+            "name": "awesome-project",
+            "license": "MIT",
+            "topics": [
+                "opensource",
+                "hacktoberfest"
+            ],
+            "url": "https://github.com/john_doe/awesome-project",
+            "avatar_url": "https://avatars.githubusercontent.com/u/12345678?v=4",
+            "commits_url": "https://api.github.com/repos/john_doe/awesome-project/commits",
+            "stargazers_count": 102,
+            "latest_commit_timestamp": "2024-04-20T16:40:05Z",
+            "latest_committer": "John Doe"
+        }
+    },
+    {
+        "model": "osd_dashboard_app.githubrepo",
+        "pk": 2,
+        "fields": {
+            "name": "cool-library",
+            "license": "Apache-2.0",
+            "topics": [
+                "python",
+                "library"
+            ],
+            "url": "https://github.com/john_doe/cool-library",
+            "avatar_url": "https://avatars.githubusercontent.com/u/12345678?v=4",
+            "commits_url": "https://api.github.com/repos/john_doe/cool-library/commits",
+            "stargazers_count": 68,
+            "latest_commit_timestamp": "2024-04-18T09:25:40Z",
+            "latest_committer": "John Doe"
+        }
+    },
+    {
+        "model": "osd_dashboard_app.githubrepo",
+        "pk": 3,
+        "fields": {
+            "name": "project-x",
+            "license": "GPL-3.0",
+            "topics": [
+                "java",
+                "web-app"
+            ],
+            "url": "https://github.com/jane_smith/project-x",
+            "avatar_url": "https://avatars.githubusercontent.com/u/98765432?v=4",
+            "commits_url": "https://api.github.com/repos/jane_smith/project-x/commits",
+            "stargazers_count": 75,
+            "latest_commit_timestamp": "2024-04-19T11:55:40Z",
+            "latest_committer": "Jane Smith"
+        }
+    }
+]
