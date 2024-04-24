@@ -12,7 +12,7 @@ env = environ.Env(
 )
 
 environ.Env.read_env(raise_error_if_not_found=True)
-GITHUB_ORG_ACCESS_TOKEN = env.str('GITHUB_ORG_ACCESS_TOKEN')
+
 
 class GitHubRepositoriesView(View):
     def get(self, request):
@@ -22,6 +22,7 @@ class GitHubRepositoriesView(View):
         """
         last_month = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = "https://api.github.com/search/repositories"
+        GITHUB_ORG_ACCESS_TOKEN = env.str('GITHUB_ORG_ACCESS_TOKEN')
         headers = {
             "Authorization": f"Bearer {GITHUB_ORG_ACCESS_TOKEN}"
         }
