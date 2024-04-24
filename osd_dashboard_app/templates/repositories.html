@@ -1,18 +1,49 @@
 {% extends 'base.html' %}
-
 {% block title %}Repositories{% endblock %}
-
 {% block content %}
-<h1>Repositories</h1>
+
+
+<h2>Featured Project</h2>
+{% if featured_repo_result %}
+        <ul>
+            <li><b>{{ featured_repo_result.name }}</b></li>
+            <li>Description: {{ featured_repo_result.description }}</li>
+            <li>Languages: {{ featured_repo_result.language }}</li>
+            <li>Topics: {{ featured_repo_result.topics }}</li>
+            <p></p>
+        </ul>
+    {% else %}
+        <p>No featured project found.</p>
+{% endif %}
+
+<h2>Latest Contributors</h2>
 <ul>
-    {% for repo in repositories %}
-
-    <li>{{ repo.name }}</li>
-    <li>{{ repo.description }}</li>
-    <li>{{ repo.language }}</li>
-    <li>{{ repo.topics }}</li>
-    <li>{{ repo.license }}</li>\
-
+    {% for contributor in latest_contributors_result %}
+        <li>{{ contributor.0 }} - {{ contributor.1 }}</li>
     {% endfor %}
 </ul>
+
+<h2>Popular Projects</h2>
+    <ul>
+        {% for project in popular_repos_result %}
+            <li><b>{{ project.name }}</b></li>
+            <li>Description: {{ project.description }}</li>
+            <li>Languages: {{ project.language }}</li>
+            <li>Topics: {{ project.topics }}</li>
+            <p></p>
+        {% endfor %}
+    </ul>
+
+<h2>All Repositories</h2>
+    <ul>
+        {% for repo in repositories %}
+            <li>{{ repo.name }}</li>
+            <li>Description: {{ repo.description }}</li>
+            <li>Languages: {{ repo.language }}</li>
+            <li>Topics: {{ repo.topics }}</li>
+            <li>License: {{ repo.licence }}</li>
+            <p></p>
+        {% endfor %}
+    </ul>
+
 {% endblock %}
