@@ -1,13 +1,20 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
 from django.views import View
+
+import random
+import environ
 import requests
 from datetime import datetime, timedelta
-import random
+
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+
+environ.Env.read_env(raise_error_if_not_found=True)
+GITHUB_ORG_ACCESS_TOKEN = env.str('GITHUB_ORG_ACCESS_TOKEN')
 
 class GitHubRepositoriesView(View):
-    # All repo data filtered by opensource and hacktoberfest
     def get(self, request):
         """A class-based view for retrieving GitHub repositories.
 
@@ -15,6 +22,9 @@ class GitHubRepositoriesView(View):
         """
         last_month = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = "https://api.github.com/search/repositories"
+        headers = {
+            "Authorization": f"Bearer {GITHUB_ORG_ACCESS_TOKEN}"
+        }
         params = {
             "q": f"topic:opensource hacktoberfest pushed:>{last_month}",
             "order": "desc",
@@ -22,9 +32,10 @@ class GitHubRepositoriesView(View):
         }
 
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(url, headers=headers, params=params)
             response.raise_for_status()
             repositories = response.json()['items']
+
         except requests.exceptions.RequestException as e:
             print(f"Failed to fetch GitHub repositories: {e}")
             return HttpResponse("Failed to fetch GitHub repositories", status=500)
@@ -48,13 +59,20 @@ class GitHubRepositoriesView(View):
                 'updated_at': updated_at,
                 'commits_url': commits_url
             }) 
-        popular_projects_result = popular_projects(repositories)
-        # featured_project_result = featured_project(popular_projects_result)
-        # latest_contributors_result = latest_contributors(repositories)
-        latest_contributors(repositories)
-        return render(request, 'repositories.html', {'repositories': repositories})
 
-        # return render(request, 'repositories.html', {'latest_contributors_result': latest_contributors_result[0], 'popular_projects_result': popular_projects_result}) {'featured_project_result': featured_project_result})
+        popular_repos_result = popular_repos(repositories)
+        featured_repo_result = featured_repo(popular_repos_result)
+        latest_contributors_result = latest_contributors(repositories)
+        latest_contributors(repositories)
+
+        context = {
+            'popular_repos_result': popular_repos_result,
+            'featured_repo_result': featured_repo_result,
+            'latest_contributors_result': latest_contributors_result,
+            'repositories': repositories
+        }
+
+        return render(request, 'repositories.html', context)
 
 def prioritize_hacktoberfest_repos(repositories):
     """Prioritize Hacktoberfest repositories.
@@ -100,23 +118,24 @@ def prioritize_hacktoberfest_repos(repositories):
 #         return None, None
 
 # Get a list of latest projects you might like
-
-def popular_projects(repos):
-  randomized_repos = []
+def popular_repos(repos):
+  popular_repos_randomized = []
  
   for repo in repos:
-    if not repo['full_name'] in randomized_repos:
-        randomized_repos.append(repo)
+    if not repo['full_name'] in popular_repos_randomized:
+        popular_repos_randomized.append(repo)
   
-  return randomized_repos
-# add randomizer(maybe?)
+  return popular_repos_randomized
 
-# def featured_project(repos):
-    # random_repo_index = random.randint(0, len(repos) - 1)
-    # random_repo_result = repos[random_repo_index]
-    # return random_repo_result 
+
+def featured_repo(repos):
+    random_repo_index = random.randint(0, len(repos) - 1)
+    random_featured_repo = repos[random_repo_index]
+    
+    return random_featured_repo 
 
 # Get a list of latest contributors
+# TO DO: Edit to only include contributors with an OSD account
 def latest_contributors(repos):
   calc_12_hours = (datetime.now() - timedelta(hours=12)).strftime("%Y-%m-%dT%H:%M:%SZ")
   repos_last_12_hours = list(filter(lambda repo: repo['updated_at'] < calc_12_hours, repos))
@@ -131,7 +150,6 @@ def latest_contributors(repos):
 
 
   for url in last_commits_url_from_each_repo:
-    print(url)
     commits_response = requests.get(url)
     commits_response_json = commits_response.json()
 
@@ -140,14 +158,13 @@ def latest_contributors(repos):
         if latest_commit_author:
             latest_commit_authors.append(latest_commit_author)
 
-#   for url in last_commits_url_from_each_repo:
-#       repo_name = url.split('/')[-2]
-#       latest_repo_names.append(repo_name)
+    for url in last_commits_url_from_each_repo:
+        repo_name = url.split('/')[-2]
+        latest_repo_names.append(repo_name)
 
-#   print('latest_commit_author', latest_commit_authors)
-#   print('\n')
-#   print('latest_repo_names', latest_repo_names)
+    zipped_users_and_repos = zip(latest_commit_authors, latest_repo_names)
 
-#   print('zipped users and repos', zip(latest_commit_authors, latest_repo_names))
-#   # return list(zip(latest_commit_authors, latest_repo_names))
-#   return [latest_commit_authors, latest_repo_names]
+    zipped_list = list(zipped_users_and_repos)
+    print('zipped_list', zipped_list)
+
+    return zipped_list
