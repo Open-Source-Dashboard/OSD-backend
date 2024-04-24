@@ -15,11 +15,13 @@ environ.Env.read_env(raise_error_if_not_found=True)
 
 
 class GitHubRepositoriesView(View):
-    def get(self, request):
-        """A class-based view for retrieving GitHub repositories.
 
-        This class extends the Django `View` class and provides a `get` method to handle HTTP GET requests. It retrieves the top open-source repositories on GitHub that were pushed within the last 24 hours and sorts them by the number of stars in descending order.
-        """
+    # All repo data filtered by opensource and hacktoberfest
+    """A class-based view for retrieving GitHub repositories.
+
+    This class extends the Django `View` class and provides a `get` method to handle HTTP GET requests. It retrieves the top open-source repositories on GitHub that were pushed within the last 30 days and sorts them by the number of stars in descending order.
+    """
+    def get(self, request):
         last_month = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = "https://api.github.com/search/repositories"
         GITHUB_ORG_ACCESS_TOKEN = env.str('GITHUB_ORG_ACCESS_TOKEN')
@@ -40,7 +42,7 @@ class GitHubRepositoriesView(View):
         except requests.exceptions.RequestException as e:
             print(f"Failed to fetch GitHub repositories: {e}")
             return HttpResponse("Failed to fetch GitHub repositories", status=500)
-        
+
         repositories = prioritize_hacktoberfest_repos(repositories)
 
         for repo in repositories:
@@ -123,17 +125,17 @@ def popular_repos(repos):
   popular_repos_randomized = []
  
   for repo in repos:
-    if not repo['full_name'] in popular_repos_randomized:
-        popular_repos_randomized.append(repo)
+    
+    if not repo['name'] in randomized_repos:
+        randomized_repos.append(repo)
   
   return popular_repos_randomized
 
 
-def featured_repo(repos):
-    random_repo_index = random.randint(0, len(repos) - 1)
-    random_featured_repo = repos[random_repo_index]
-    
-    return random_featured_repo 
+# def featured_project(repos):
+# random_repo_index = random.randint(0, len(repos) - 1)
+# random_repo_result = repos[random_repo_index]
+# return random_repo_result
 
 # Get a list of latest contributors
 # TO DO: Edit to only include contributors with an OSD account
