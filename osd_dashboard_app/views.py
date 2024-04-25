@@ -38,7 +38,6 @@ class GitHubRepositoriesView(View):
             response = requests.get(url, headers=headers, params=params)
             response.raise_for_status()
             repositories = response.json()['items']
-
         except requests.exceptions.RequestException as e:
             print(f"Failed to fetch GitHub repositories: {e}")
             return HttpResponse("Failed to fetch GitHub repositories", status=500)
@@ -87,14 +86,16 @@ def prioritize_hacktoberfest_repos(repositories):
     Returns:
         list: A list of GitHub repositories with Hacktoberfest repositories prioritized.
     """
+
     hacktoberfest_repos = []
     other_repos = []
+
     for repo in repositories:
         if 'hacktoberfest' in repo['topics']:
             hacktoberfest_repos.append(repo)
-        
         else:
             other_repos.append(repo)
+
     return hacktoberfest_repos + other_repos
 
 def popular_repos(repos):
@@ -129,12 +130,12 @@ def featured_repo(repos):
     Returns:
         list: A list of latest contributors.
     """
+
     random_repo_index = random.randint(0, len(repos) - 1)
     random_repo_result = repos[random_repo_index]
     
     return random_repo_result
 
-# Get a list of latest contributors
 # TO DO: Edit to only include contributors with an OSD account
 def latest_contributors(repos):
     """Get a list of latest contributors.
@@ -147,9 +148,9 @@ def latest_contributors(repos):
     Returns:
         list: A list of latest contributors.
     """
+    
     calc_12_hours = (datetime.now() - timedelta(hours=12)).strftime("%Y-%m-%dT%H:%M:%SZ")
     repos_last_12_hours = list(filter(lambda repo: repo['updated_at'] < calc_12_hours, repos))
-
 
     last_commits_url_from_each_repo = []
     latest_commit_authors = []
@@ -163,7 +164,7 @@ def latest_contributors(repos):
     for url in last_commits_url_from_each_repo:
         commits_response = requests.get(url)
         commits_response_json = commits_response.json()
-        # print('commits_response_json', commits_response_json[:2])
+
         try:
             if commits_response_json:
                 latest_commit_author = commits_response_json[0].get('author', {}).get('login')
@@ -173,13 +174,10 @@ def latest_contributors(repos):
             print('empty url', commits_response_json)
             pass
 
-
         for url in last_commits_url_from_each_repo:
             repo_name = url.split('/')[-2]
             latest_repo_names.append(repo_name)
 
     zipped_users_and_repos = zip(latest_commit_authors, latest_repo_names)
     
-    zipped_list = list(zipped_users_and_repos)
-
-    return zipped_list
+    return list(zipped_users_and_repos)
