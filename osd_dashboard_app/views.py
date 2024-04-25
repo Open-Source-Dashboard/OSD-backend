@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views import View
+from .serializers import GithubRepoSerializer
+from .models import GithubRepo
 
 import random
 import environ
@@ -38,6 +41,7 @@ class GitHubRepositoriesView(View):
             response = requests.get(url, headers=headers, params=params)
             response.raise_for_status()
             repositories = response.json()['items']
+            
         except requests.exceptions.RequestException as e:
             print(f"Failed to fetch GitHub repositories: {e}")
             return HttpResponse("Failed to fetch GitHub repositories", status=500)
@@ -181,3 +185,14 @@ def latest_contributors(repos):
     zipped_users_and_repos = zip(latest_commit_authors, latest_repo_names)
     
     return list(zipped_users_and_repos)
+
+# URL for sample request: http://127.0.0.1:8000/osd/api/github/repositories/
+def github_repositories(request):
+    # Retrieve all GitHub repositories from the database
+    repositories = GithubRepo.objects.all()
+    
+    # Serialize the repositories
+    serializer = GithubRepoSerializer(repositories, many=True)
+    
+    # Return the serialized data as JSON response
+    return JsonResponse(serializer.data, safe=False)

@@ -4,16 +4,6 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import requests
 
-# Create your models here.
-# '''
-# User model that includes
-
-# # User name -  char
-# # Donut stampcard - int
-# # Donut boxes - int
-# # Last commit date - from Github api
-# # Last commit repo name - from Github api
-# '''
 class GithubUser(models.Model):
     username = models.CharField(max_length=100)
     avatar_url = models.URLField()
@@ -37,7 +27,11 @@ class GithubRepo(models.Model):
         return self.name
     
 # does views latest_contributors logic need to go here?
-
+class Contributor(models.Model):
+    name = models.CharField(max_length=255)
+    repo = models.ForeignKey(GithubRepo, on_delete=models.CASCADE)
+    commit_url = models.URLField()
+    last_commit_repo_name = models.CharField(max_length=255)
 
 
 # from django.contrib.auth.models import AbstractUser
