@@ -4,9 +4,9 @@ from django.http import JsonResponse
 from django.views import View
 
 class GitHubAuthCallback(View):
-    def post(self, request):
+    def get(self, request):
         # Get auth code from frontend
-        code = request.POST.get('code')
+        code = request.GET.get('code')
 
         client_id = os.getenv('GITHUB_CLIENT_ID')
         client_secret = os.getenv('GITHUB_CLIENT_SECRET')
@@ -25,9 +25,17 @@ class GitHubAuthCallback(View):
         response = requests.post(token_url, data=data, headers=headers)
         response_json = response.json()
 
+        # if 'access_token' in response_json:
+        #     # Return the access token to the frontend
+        #     return JsonResponse({'token': response_json['access_token']})
+        # else:
+        #     return JsonResponse(
+        #         {'error': 'Failed to get access token'}, status=400
+        #     )
+
         if 'access_token' in response_json:
-            # Return the access token to the frontend
-            return JsonResponse({'token': response_json['access_token']})
+            print(response_json)
+            return JsonResponse({'success': 'Access token received'}, status=200)
         else:
             return JsonResponse(
                 {'error': 'Failed to get access token'}, status=400
