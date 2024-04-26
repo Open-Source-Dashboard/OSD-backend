@@ -1,7 +1,14 @@
 import os
 import environ
 
-env = environ.Env()
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_ORIGINS=(list, []),
+    ALLOW_ALL_ORIGINS=(bool, False),
+    GITHUB_CLIENT_ID=(str, ''),
+    GITHUB_CLIENT_SECRET=(str, ''),
+    GITHUB_ORG_ACCESS_TOKEN=(str, ''),
+)
 environ.Env.read_env()
 
 # Build paths inside the project
@@ -121,5 +128,6 @@ STATIC_URL = '/static/'
 
 
 # CORS settings
-CORS_ORIGIN_WHITELIST = 'http://localhost:3000',
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = env.list('ALLOWED_ORIGINS')
+CORS_ALLOW_ALL_ORIGINS = env.bool('ALLOW_ALL_ORIGINS')
+CSRF_TRUSTED_ORIGINS = env.list('ALLOWED_ORIGINS')
