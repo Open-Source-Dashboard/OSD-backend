@@ -1,7 +1,14 @@
 import os
 import environ
 
-env = environ.Env()
+env = environ.Env(
+    DEBUG=(bool, False),
+    ALLOWED_ORIGINS=(list, []),
+    ALLOW_ALL_ORIGINS=(bool, False),
+    GITHUB_CLIENT_ID=(str, ''),
+    GITHUB_CLIENT_SECRET=(str, ''),
+    GITHUB_ORG_ACCESS_TOKEN=(str, ''),
+)
 environ.Env.read_env()
 
 # Build paths inside the project
@@ -30,10 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'osd_dashboard_app',
+    # Third-party apps
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -115,3 +125,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# CORS settings
+CORS_ALLOWED_ORIGINS = env.list('ALLOWED_ORIGINS')
+CORS_ALLOW_ALL_ORIGINS = env.bool('ALLOW_ALL_ORIGINS')
+CSRF_TRUSTED_ORIGINS = env.list('ALLOWED_ORIGINS')
