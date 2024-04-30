@@ -5,7 +5,13 @@ from datetime import datetime, timedelta
 import requests
 
 
-
+class GithubRepoManager(models.Manager):
+    """Filter repositories that include 'hacktoberfest' in their topics."""
+    def with_hacktoberfest(self):
+        return self.get_queryset().filter(topics__contains=['hacktoberfest']).order_by('stargazers_count')
+    def random_featured(self):
+        return self.get_queryset().order_by('?').first()
+# If performance becomes an issue, consider alternative methods to achieve randomness, such as selecting a random index in Python and retrieving the specific entry by ID.
 
 class GithubUser(models.Model):
     username = models.CharField(max_length=100)
@@ -26,6 +32,8 @@ class GithubRepo(models.Model):
     latest_commit_timestamp = models.DateTimeField(default=timezone.now, null=True, blank=True)
     latest_committer = models.CharField(max_length=255, null=True, blank=True)
     
+    objects = GithubRepoManager()
+    
     def __str__(self):
         return self.name
 
@@ -37,7 +45,7 @@ class RepoContributor(models.Model):
     last_commit_repo_name = models.CharField(max_length=255)
 
 
-class OSDuser(AbstractUser):
+class OSDUserProfile(AbstractUser):
     github_username = models.CharField(max_length=100, blank=True, null=True)
     donut_stampcard_count = models.IntegerField(default=0)
     donut_boxes = models.IntegerField(default=0)
