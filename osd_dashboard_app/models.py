@@ -29,7 +29,7 @@ class GithubRepoManager(models.Manager):
 
     def get_popular_repos(self, repositories):
         """Sort repositories by stargazers_count in descending order."""
-        return sorted(repositories, key=lamda x: x['stargazers_count'], reverse=True)
+        return sorted(repositories, key=lambda x: x['stargazers_count'], reverse=True)
 
 # double check randomizer    
     def get_featured_repo(self, repositories):
