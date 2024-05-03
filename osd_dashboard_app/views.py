@@ -1,4 +1,4 @@
-from django.views import View
+from django.views.generic import TemplateView
 from .models import GithubRepo
 import environ
 
@@ -6,7 +6,7 @@ import environ
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(raise_error_if_not_found=True)
 
-class GitHubRepositoriesView(View):
+class GitHubRepositoriesView(TemplateView):
     template_name = 'repositories.html'
   
     def get_context_data(self, **kwargs):

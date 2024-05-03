@@ -1,42 +1,43 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils import timezone
-from django.conf import settings
+from django.conf import settings 
 from datetime import datetime, timedelta
-import requests, random
+import requests, random, environ
 
+env = environ.Env()
+environ.Env.read_env()
 
 class GithubRepoManager(models.Manager):
     """Fetch and process repositories from GitHub."""
     def fetch_repos(self, include_hacktoberfest=False):
         last_month = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = 'https://api.github.com/search/repositories'
-        query = 'topic: opensource'
+        query = 'opensource'
         if include_hacktoberfest:
             query += ' hacktoberfest'
-        headers = {
-            'Authorization': f'Bearer {settings.GITHUB_ORG_ACCESS_TOKEN}'}
+        headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
 
         params = {
             "q": f"topic:{query} pushed:>{last_month}",
             "order": "desc",
             "sort": "updated",
-            "limit": 20
+            "per_page": 20
         }
         response = requests.get(url,headers=headers, params=params)
-        response.raise_for_status
-        return self.response.json()['items']
+        response.raise_for_status()
+        return response.json()['items']
 
     def get_popular_repos(self, repositories):
         """Sort repositories by stargazers_count in descending order."""
         return sorted(repositories, key=lambda x: x['stargazers_count'], reverse=True)
 
-# double check randomizer    
+    # double check randomizer
     def get_featured_repo(self, repositories):
         """Select a single random repository from a list to feature."""
         return random.choice(repositories) if repositories else None
-    
-    def prioritze_hacktoberfest_repos(self, repositories):
+
+    def prioritize_hacktoberfest_repos(self, repositories):
         hacktoberfest_repos = [repo for repo in repositories if 'hacktoberfest' in repo.get('topics', [])]
         other_repos = [repo for repo in repositories if 'hacktoberfest' not in repo.get('topics', [])]
         return hacktoberfest_repos + other_repos
@@ -70,13 +71,13 @@ class GithubRepo(models.Model):
     
     def latest_contributors(self):
         headers = {'Authorization': f'Bearer {settings.GITHUB_ORG_ACCESS_TOKEN}'}
-        response = requests.get(f'https://api.github.com/repos/{self.name}/commits', header=headers)
+        response = requests.get(f'https://api.github.com/repos/{self.name}/commits', headers=headers)
         response.raise_for_status()
         commits = response.json()
         if commits:
-            self.latest_committer = commits[0]['commit']['commiter']['name']
+            self.latest_committer = commits[0]['commit']['committer']['name']
             self.save()
-   
+
 # does views latest_contributors logic need to go here?
 class RepoContributor(models.Model):
     name = models.CharField(max_length=255)
@@ -91,3 +92,6 @@ class OSDUserProfile(AbstractUser):
     donut_boxes = models.IntegerField(default=0)
     last_commit_date = models.DateTimeField(null=True, blank=True)
     last_commit_repo_name = models.CharField(max_length=255, null=True, blank=True)
+    groups = models.ManyToManyField(Group, related_name="osd_user_profiles", blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name="osd_user_profile_permissions", blank=True
+    )
