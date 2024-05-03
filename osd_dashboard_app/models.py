@@ -24,9 +24,13 @@ class GithubRepoManager(models.Manager):
             "sort": "updated",
             "per_page": 20
         }
-        response = requests.get(url,headers=headers, params=params)
-        response.raise_for_status()
-        return response.json()['items']
+        try:
+            response = requests.get(url,headers=headers, params=params)
+            response.raise_for_status()
+            return response.json().get('items', [])
+        except requests.exceptions.RequestException as e:
+            print(f'Error fetching repositories: {str(e)}')
+            return []
 
     def get_popular_repos(self, repositories):
         """Sort repositories by stargazers_count in descending order."""
@@ -70,7 +74,7 @@ class GithubRepo(models.Model):
         return self.name
     
     def latest_contributors(self):
-        headers = {'Authorization': f'Bearer {settings.GITHUB_ORG_ACCESS_TOKEN}'}
+        headers = {'Authorization': f'Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}'}
         response = requests.get(f'https://api.github.com/repos/{self.name}/commits', headers=headers)
         response.raise_for_status()
         commits = response.json()
