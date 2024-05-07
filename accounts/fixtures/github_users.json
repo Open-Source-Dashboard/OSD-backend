@@ -1,9 +1,8 @@
-// github_users.json
 [
   {
-    "model": "accounts.githubuser", // App label and model name
-    "pk": 1,                         // Primary key
-    "fields": {                      // Field values
+    "model": "accounts.githubuser", 
+    "pk": 1,                         
+    "fields": {                      
       "user_name": "User One",
       "registration_date": "2024-05-01T00:00:00Z",
       "last_login_date": "2024-05-04T08:30:00Z",
@@ -13,19 +12,19 @@
       "donut_stampcard_count": 5,
       "donut_box_count": 3
     }
-  },
-  {
-    "model": "accounts.githubuser",
-    "pk": 2,
-    "fields": {
-      "user_name": "User Two",
-      "registration_date": "2024-05-02T00:00:00Z",
-      "last_login_date": "2024-05-03T10:45:00Z",
-      "repos": "https://github.com/user2",
-      "commits_url": "https://api.github.com/user2/commits",
-      "last_commit_repo": "Project B",
-      "donut_stampcard_count": 10,
-      "donut_box_count": 7
-    }
   }
+  // ,{
+  //   "model": "accounts.githubuser",
+  //   "pk": 2,
+  //   "fields": {
+  //     "user_name": "User Two",
+  //     "registration_date": "2024-05-02T00:00:00Z",
+  //     "last_login_date": "2024-05-03T10:45:00Z",
+  //     "repos": "https://github.com/user2",
+  //     "commits_url": "https://api.github.com/user2/commits",
+  //     "last_commit_repo": "Project B",
+  //     "donut_stampcard_count": 10,
+  //     "donut_box_count": 7
+  //   }
+  // }
 ]

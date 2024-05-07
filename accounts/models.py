@@ -6,7 +6,7 @@ class GitHubUser(AbstractUser):
     user_name = models.CharField(max_length=255, blank=True, null=True)
     registration_date = models.DateTimeField(auto_now_add=True)
     last_login_date = models.DateTimeField(auto_now=True)
-    repos = models.URLField()
+    # repos = models.URLField()
     commits_url = models.URLField()
     last_commit_repo = models.CharField(max_length=255)
     donut_stampcard_count = models.IntegerField(default=0)

@@ -27,11 +27,11 @@ class GithubRepo(models.Model):
         return self.name
     
 # does views latest_contributors logic need to go here?
-class Contributor(models.Model):
-    name = models.CharField(max_length=255)
-    repo = models.ForeignKey(GithubRepo, on_delete=models.CASCADE)
-    commit_url = models.URLField()
-    last_commit_repo_name = models.CharField(max_length=255)
+# class Contributor(models.Model):
+#     name = models.CharField(max_length=255)
+#     repo = models.ForeignKey(GithubRepo, on_delete=models.CASCADE)
+#     commit_url = models.URLField()
+#     last_commit_repo_name = models.CharField(max_length=255)
 
 
 # from django.contrib.auth.models import AbstractUser
