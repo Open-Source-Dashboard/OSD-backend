@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>User Detail</h2>
+    <p>User Name: {{ user.user_name }}</p>
+    <p>Registration Date: {{ user.registration_date }}</p>
+    <p>Last Login Date: {{ user.last_login_date }}</p>
+    <p>Repos: {{ user.repos }}</p>
+    <p>Commits URL: {{ user.commits_url }}</p>
+    <p>Last Commit Repository: {{ user.last_commit_repo }}</p>
+    <p>Donut Stampcard Count: {{ user.donut_stampcard_count }}</p>
+    <p>Donut Box Count: {{ user.donut_box_count }}</p>
+{% endblock %}

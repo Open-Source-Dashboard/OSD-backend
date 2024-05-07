@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>User List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Registration Date</th>
+                <th>Last Login Date</th>
+                <th>Repos</th>
+                <th>Commits URL</th>
+                <th>Last Commit Repository</th>
+                <th>Donut Stampcard Count</th>
+                <th>Donut Box Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.user_name }}</td>
+                <td>{{ user.registration_date }}</td>
+                <td>{{ user.last_login_date }}</td>
+                <td>{{ user.repos }}</td>
+                <td>{{ user.commits_url }}</td>
+                <td>{{ user.last_commit_repo }}</td>
+                <td>{{ user.donut_stampcard_count }}</td>
+                <td>{{ user.donut_box_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
