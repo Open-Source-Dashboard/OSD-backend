@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'osd_dashboard_app',
+    'accounts',
     # Third-party apps
     'corsheaders',
 ]
