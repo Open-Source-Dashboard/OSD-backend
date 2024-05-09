@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils import timezone
-from django.conf import settings 
 from datetime import datetime, timedelta
 import requests, random, environ
 
@@ -21,7 +20,7 @@ class GithubUser(models.Model):
 class GithubRepoManager(models.Manager):
     """Fetch and process repositories from GitHub."""
 
-    def fetch_repos(self, include_hacktoberfest=False):
+    def fetch_repos(self):
         last_month = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = 'https://api.github.com/search/repositories'
         headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
@@ -45,7 +44,6 @@ class GithubRepoManager(models.Manager):
         """Sort repositories by stargazers_count in descending order."""
         
         return random.sample(repositories, min(len(repositories), 5))
-    # double check randomizer
     def get_featured_repo(self, repositories):
         """Select a single random repository from a list to feature."""
         
