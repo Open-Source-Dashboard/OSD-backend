@@ -39,6 +39,7 @@ class GithubRepoManager(models.Manager):
             return repositories
         except requests.exceptions.RequestException as e:
             print(f'Error fetching repositories: {str(e)}')
+            return []
 
     def get_popular_repos(self, repositories):
         """Sort repositories by stargazers_count in descending order."""
@@ -83,7 +84,7 @@ class GithubRepoManager(models.Manager):
                 continue
             repo_name = url.split('/')[-2]
             latest_repo_names.append(repo_name)
-        return zip(latest_commit_authors, latest_repo_names)
+        return [{"author": author, "repo_name": repo_name} for author, repo_name in zip(latest_commit_authors, latest_repo_names)]
 
 
 # If performance becomes an issue, consider alternative methods to achieve randomness, such as selecting a random index in Python and retrieving the specific entry by ID.
@@ -94,7 +95,7 @@ class GithubRepo(models.Model):
     license = models.CharField(max_length=100)
     topics = models.JSONField()
     url = models.URLField()
-    avatar_url = models.URLField()
+    # avatar_url = models.URLField()
     commits_url = models.URLField()
     stargazers_count = models.IntegerField()
     latest_commit_timestamp = models.DateTimeField(default=timezone.now, null=True, blank=True)
