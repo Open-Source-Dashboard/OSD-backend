@@ -100,3 +100,6 @@ poetry.lock
 sample_json/
 
 get_jwt.py
+
+# Django SQLite database file
+db.sqlite3
