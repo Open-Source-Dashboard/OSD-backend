@@ -45,17 +45,16 @@ class GithubRepoManager(models.Manager):
         """Sort repositories by stargazers_count in descending order."""
         
         return random.sample(repositories, min(len(repositories), 5))
+    
     def get_featured_repo(self, repositories):
         """Select a single random repository from a list to feature."""
         
         featured_repo = random.choice(repositories) if repositories else None
-        print(f'featured repo: {featured_repo}')
-        return featured_repo
+        return [featured_repo]
+    
     def prioritize_hacktoberfest_repos(self, repositories):
         hacktoberfest_repos = [repo for repo in repositories if 'hacktoberfest' in repo['topics']]
         other_repos = [repo for repo in repositories if 'hacktoberfest' not in repo['topics']]
-        # print(f'hacktoberfest repos: {hacktoberfest_repos}')
-        # print(f'other repos: {other_repos}')
         return hacktoberfest_repos + other_repos
 
 
@@ -84,6 +83,7 @@ class GithubRepoManager(models.Manager):
                 continue
             repo_name = url.split('/')[-2]
             latest_repo_names.append(repo_name)
+
         return [{"author": author, "repo_name": repo_name} for author, repo_name in zip(latest_commit_authors, latest_repo_names)]
 
 
