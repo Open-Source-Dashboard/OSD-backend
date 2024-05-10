@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'osd_dashboard_app',
+    'repos_app',
     'accounts',
     # Third-party apps
     'corsheaders',
@@ -59,7 +59,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            '/osd_dashboard_app/templates/' ],
+            '/repos_app/templates/' ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

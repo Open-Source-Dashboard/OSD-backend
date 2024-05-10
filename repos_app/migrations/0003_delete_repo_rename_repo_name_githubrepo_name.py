@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('osd_dashboard_app', '0002_githubrepo_githubuser'),
+        ('repos_app', '0002_githubrepo_githubuser'),
     ]
 
     operations = [

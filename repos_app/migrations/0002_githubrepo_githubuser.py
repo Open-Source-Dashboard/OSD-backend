@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('osd_dashboard_app', '0001_initial'),
+        ('repos_app', '0001_initial'),
     ]
 
     operations = [

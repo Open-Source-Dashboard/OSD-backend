@@ -1,5 +1,5 @@
 from django.urls import path
-from osd_dashboard_app.views import GitHubRepositoriesView
+from repos_app.views import GitHubRepositoriesView
 from .auth import GitHubAuthCallback 
 
 
