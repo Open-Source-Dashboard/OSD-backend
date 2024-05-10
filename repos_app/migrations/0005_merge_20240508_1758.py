@@ -6,8 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('osd_dashboard_app', '0004_contributor'),
-        ('osd_dashboard_app', '0004_repocontributor_osduserprofile'),
+        ('repos_app', '0004_contributor'),
+        ('repos_app', '0004_repocontributor_osduserprofile'),
     ]
 
     operations = [

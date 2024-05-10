@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0012_alter_user_first_name_max_length'),
-        ('osd_dashboard_app', '0003_delete_repo_rename_repo_name_githubrepo_name'),
+        ('repos_app', '0003_delete_repo_rename_repo_name_githubrepo_name'),
     ]
 
     operations = [
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255)),
                 ('commit_url', models.URLField()),
                 ('last_commit_repo_name', models.CharField(max_length=255)),
-                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='osd_dashboard_app.githubrepo')),
+                ('repo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='repos_app.githubrepo')),
             ],
         ),
         migrations.CreateModel(

@@ -1,6 +1,6 @@
 [
     {
-        "model": "osd_dashboard_app.githubrepo",
+        "model": "repos_app.githubrepo",
         "pk": 1,
         "fields": {
             "name": "awesome-project",
@@ -18,7 +18,7 @@
         }
     },
     {
-        "model": "osd_dashboard_app.githubrepo",
+        "model": "repos_app.githubrepo",
         "pk": 2,
         "fields": {
             "name": "cool-library",
@@ -36,7 +36,7 @@
         }
     },
     {
-        "model": "osd_dashboard_app.githubrepo",
+        "model": "repos_app.githubrepo",
         "pk": 3,
         "fields": {
             "name": "project-x",
