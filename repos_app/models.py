@@ -44,7 +44,7 @@ class GithubRepoManager(models.Manager):
     def get_popular_repos(self, repositories):
         """Sort repositories by stargazers_count in descending order."""
         
-        return random.sample(repositories, min(len(repositories), 5))
+        return random.sample(repositories, min(len(repositories), 15))
     
     def get_featured_repo(self, repositories):
         """Select a single random repository from a list to feature."""
