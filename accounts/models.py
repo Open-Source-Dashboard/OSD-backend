@@ -9,8 +9,7 @@ class GitHubUser(AbstractUser):
     # repos = models.URLField()
     commits_url = models.URLField()
     last_commit_repo = models.CharField(max_length=255)
-    donut_stampcard_count = models.IntegerField(default=0)
-    donut_box_count = models.IntegerField(default=0)
+    opensource_commit_count = models.IntegerField(default=0)
 
     groups = models.ManyToManyField(
         Group,
