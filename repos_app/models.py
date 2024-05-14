@@ -8,15 +8,6 @@ env = environ.Env()
 environ.Env.read_env()
 
 
-class GithubUser(models.Model):
-    username = models.CharField(max_length=100)
-    avatar_url = models.URLField()
-    profile_url = models.URLField()
-
-    def __str__(self):
-        return self.username
-
-
 class GithubRepoManager(models.Manager):
     """Fetch and process repositories from GitHub."""
 
@@ -111,14 +102,3 @@ class RepoContributor(models.Model):
     repo = models.ForeignKey(GithubRepo, on_delete=models.CASCADE)
     commit_url = models.URLField()
     last_commit_repo_name = models.CharField(max_length=255)
-
-
-class OSDUserProfile(AbstractUser):
-    github_username = models.CharField(max_length=100, blank=True, null=True)
-    donut_stampcard_count = models.IntegerField(default=0)
-    donut_boxes = models.IntegerField(default=0)
-    last_commit_date = models.DateTimeField(null=True, blank=True)
-    last_commit_repo_name = models.CharField(max_length=255, null=True, blank=True)
-    groups = models.ManyToManyField(Group, related_name="osd_user_profiles", blank=True)
-    user_permissions = models.ManyToManyField(Permission, related_name="osd_user_profile_permissions", blank=True
-    )

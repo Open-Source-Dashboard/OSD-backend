@@ -9,22 +9,7 @@
       "repos": "https://github.com/user1",
       "commits_url": "https://api.github.com/user1/commits",
       "last_commit_repo": "Project A",
-      "donut_stampcard_count": 5,
-      "donut_box_count": 3
+      "opensource_commit_count": 10
     }
   }
-  // ,{
-  //   "model": "accounts.githubuser",
-  //   "pk": 2,
-  //   "fields": {
-  //     "user_name": "User Two",
-  //     "registration_date": "2024-05-02T00:00:00Z",
-  //     "last_login_date": "2024-05-03T10:45:00Z",
-  //     "repos": "https://github.com/user2",
-  //     "commits_url": "https://api.github.com/user2/commits",
-  //     "last_commit_repo": "Project B",
-  //     "donut_stampcard_count": 10,
-  //     "donut_box_count": 7
-  //   }
-  // }
 ]

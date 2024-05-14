@@ -1,10 +1,5 @@
 from rest_framework import serializers
-from .models import GithubUser, GithubRepo
-
-class GithubUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GithubUser
-        fields = ['id', 'username', 'avatar_url', 'profile_url']
+from .models import GithubRepo
 
 class GithubRepoSerializer(serializers.ModelSerializer):
     class Meta:

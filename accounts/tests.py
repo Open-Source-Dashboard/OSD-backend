@@ -24,8 +24,7 @@ class GitHubUserTestCase(TestCase):
         self.assertEqual(github_user.repos, 'https://github.com/user1')
         self.assertEqual(github_user.commits_url, 'https://api.github.com/user1/commits')
         self.assertEqual(github_user.last_commit_repo, 'Project A')
-        self.assertEqual(github_user.donut_stampcard_count, 5)
-        self.assertEqual(github_user.donut_box_count, 3)
+        self.assertEqual(github_user.opensource_commit_count, 10)
 
     def test_github_user_str_method(self):
         # Check the __str__ method of GitHubUser model

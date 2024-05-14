@@ -1,5 +1,4 @@
 from django.contrib import admin
-from .models import GithubRepo, GithubUser
+from .models import GithubRepo
 
-admin.site.register(GithubUser)
 admin.site.register(GithubRepo)
