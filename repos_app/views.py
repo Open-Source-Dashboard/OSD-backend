@@ -10,6 +10,8 @@ class GitHubRepositoriesView(View):
     """A class-based view for retrieving GitHub repositories."""
 
     def get(self, request):
+        if 'check_user_commits' in request.GET:
+            return self.check_user_commits(request)
         repositories = GithubRepo.objects.fetch_repos()
         if not repositories:
             return JsonResponse(
