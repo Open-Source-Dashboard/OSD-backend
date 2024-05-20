@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils import timezone
 from datetime import datetime, timedelta
 import requests, random, environ
+from accounts.models import GitHubUser
 
 env = environ.Env()
 environ.Env.read_env()
@@ -76,28 +77,25 @@ class GithubRepoManager(models.Manager):
 
         return [{"author": author, "repo_name": repo_name} for author, repo_name in zip(latest_commit_authors, latest_repo_names)]
 
-    def check_user_commits(self, repositories, authenticated_user, user_register_date):
-        repositories = self.fetch_repos()
-        if not repositories:
-            return []
-        user_register_date = datetime.strptime(user_register_date, "%Y-%m-%dT%H:%M:%SZ")
-        headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
-        
+    def check_user_commits(self, repositories, user_name, registration_date):    
         for repo in repositories:
             commits_url = repo['commits_url'].split('{')[0]
             
             try:
-                commits_response = requests.get(commits_url, headers=headers)
+                commits_response = requests.get(commits_url)
                 commits_response.raise_for_status()
                 commits = commits_response.json()
+                print('commits:', commits)
                 
                 for commit in commits:
                     commit_author = commit.get('author', {}).get('login', {})
                     commit_date = datetime.strptime(commit.get('commit', {}).get('author', {}).get('date', "%Y-%m-%dT%H:%M:%SZ"))
-                    
-                    if commit_author == authenticated_user and commit_date > user_register_date:
+                    if commit_author == user_name and commit_date > registration_date:
                         return True
-                    
+                    print('commit author', commit_author)
+                    print('commit date:', commit_date)
+                  
+                            
             except requests.exceptions.RequestException as e:
                 print(f' Error fetching commits for repo {repo['name']}: {str(e)}')
             

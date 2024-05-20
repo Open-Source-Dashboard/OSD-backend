@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
-from .models import GitHubRepo
+from repos_app.models import GithubRepo
 from datetime import datetime
 
 class GitHubUser(AbstractUser):
@@ -9,7 +9,7 @@ class GitHubUser(AbstractUser):
     registration_date = models.DateTimeField(auto_now_add=True)
     last_login_date = models.DateTimeField(auto_now=True)
     # repos = models.URLField()
-    commits_url = models.URLField()
+    # commits_url = models.URLField()
     last_commit_repo = models.CharField(max_length=255)
     opensource_commit_count = models.IntegerField(default=0)
 
@@ -32,11 +32,11 @@ class GitHubUser(AbstractUser):
         authenticated_user = self.user_name
         user_register_date = self.registration_date.strptime("%Y-%m-%dT%H:%M:%SZ")
 
-        repositories = GitHubRepo.objects.fetch_repos()
+        repositories = GithubRepo.objects.fetch_repos()
         if not repositories:
             print('No repos fetched')
             return 
-        has_committed = GitHubRepo.objects.check_user_commits(repositories, authenticated_user, user_register_date)
+        has_committed = GithubRepo.objects.check_user_commits(repositories, authenticated_user, user_register_date)
         if has_committed:
             self.opensource_commit_count += 1
             self.save

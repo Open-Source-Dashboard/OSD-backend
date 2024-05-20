@@ -1,12 +1,12 @@
 from django.contrib.auth.models import User 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from rest_framework import generics
 from .serializers import GitHubUserSerializer
 import requests
 from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import GitHubUser
+
 
 
 class UserListView(generics.ListAPIView):
@@ -45,15 +45,3 @@ class CheckUserView(LoginRequiredMixin, View):
         is_new_user = not User.objects.filter(id=user_id).exists()
         return JsonResponse({'isNewUser': is_new_user})
 
-class CheckAndAddDonutsView(LoginRequiredMixin, View):
-    def get(self, request, user_name, *args, **kwargs):
-        user = get_object_or_404(GitHubUser, user_name=user_name)
-        user.check_and_increment_donut()
-        return JsonResponse(
-            {
-                "status": "success",
-                "message": "Check completed.",
-                "user": user.user_name,
-                "opensource_commit_count": user.opensource_commit_count,
-            }
-        )
