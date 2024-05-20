@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils import timezone
 from datetime import datetime, timedelta
 import requests, random, environ
+from accounts.models import GitHubUser
 
 env = environ.Env()
 environ.Env.read_env()
@@ -34,24 +35,23 @@ class GithubRepoManager(models.Manager):
 
     def get_popular_repos(self, repositories):
         """Sort repositories by stargazers_count in descending order."""
-        
+
         return random.sample(repositories, min(len(repositories), 15))
-    
+
     def get_featured_repo(self, repositories):
         """Select a single random repository from a list to feature."""
-        
+
         featured_repo = random.choice(repositories) if repositories else None
         return [featured_repo]
-    
+
     def prioritize_hacktoberfest_repos(self, repositories):
         hacktoberfest_repos = [repo for repo in repositories if 'hacktoberfest' in repo['topics']]
         other_repos = [repo for repo in repositories if 'hacktoberfest' not in repo['topics']]
         return hacktoberfest_repos + other_repos
 
-
     def get_latest_contributors(self, repositories):
         """Get a list of latest contributors."""
-        
+
         calc_12_hours = (datetime.now() - timedelta(hours=12)).strftime("%Y-%m-%dT%H:%M:%SZ")
         repos_last_12_hours = [repo for repo in repositories if repo['updated_at'] < calc_12_hours
         ]
@@ -59,11 +59,11 @@ class GithubRepoManager(models.Manager):
 
         latest_commit_authors = []
         latest_repo_names = []
-        
+
         for url in latest_commits_url_each_repo:
             commits_response = requests.get(url)
             commits_response_json = commits_response.json()
-            
+
             try:
                 if commits_response_json:
                     latest_commit_author = commits_response_json[0].get('author', {}).get('login')
@@ -76,6 +76,30 @@ class GithubRepoManager(models.Manager):
             latest_repo_names.append(repo_name)
 
         return [{"author": author, "repo_name": repo_name} for author, repo_name in zip(latest_commit_authors, latest_repo_names)]
+
+    def check_user_commits(self, repositories, user_name, registration_date):    
+        for repo in repositories:
+            commits_url = repo['commits_url'].split('{')[0]
+            
+            try:
+                commits_response = requests.get(commits_url)
+                commits_response.raise_for_status()
+                commits = commits_response.json()
+                print('commits:', commits)
+                
+                for commit in commits:
+                    commit_author = commit.get('author', {}).get('login', {})
+                    commit_date = datetime.strptime(commit.get('commit', {}).get('author', {}).get('date', "%Y-%m-%dT%H:%M:%SZ"))
+                    if commit_author == user_name and commit_date > registration_date:
+                        return True
+                    print('commit author', commit_author)
+                    print('commit date:', commit_date)
+                  
+                            
+            except requests.exceptions.RequestException as e:
+                print(f' Error fetching commits for repo {repo['name']}: {str(e)}')
+            
+        return False
 
 
 # If performance becomes an issue, consider alternative methods to achieve randomness, such as selecting a random index in Python and retrieving the specific entry by ID.

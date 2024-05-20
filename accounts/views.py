@@ -7,6 +7,8 @@ from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+
+
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = GitHubUserSerializer
@@ -42,3 +44,4 @@ class CheckUserView(LoginRequiredMixin, View):
         user_id = request.GET.get('user_id')
         is_new_user = not User.objects.filter(id=user_id).exists()
         return JsonResponse({'isNewUser': is_new_user})
+

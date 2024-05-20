@@ -2,7 +2,13 @@
 {% block title %}Repositories{% endblock %}
 {% block content %}
 
-
+<h2>Checking User commits</h2>
+    <div id="'commit-check-result"></div>
+        {% if message %}
+            <p>{{ message }}</p>
+        {% elif error %}
+            <p>{{ error }}</p>  
+        {% endif %}
 <h2>Featured Project</h2>
 {% if featured_repo_result %}
         <ul>
