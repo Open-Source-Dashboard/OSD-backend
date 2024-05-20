@@ -1,31 +1,35 @@
-# Project: Open Source Dashboard
+# Opensource Dashboard Backend
 
-Authors: Tammy Do, Andrea Riley(Thiel), Lana Zumbrunn, Caleb Hemphill
+Welcome to OpenSource Dashboard, where devs receive virtually sweet rewards 🍩 for contributions to opensource projects. 
 
-## Feature Tasks
+Built with React App & Python Django styled with Tailwind CSS, and utilizing PostgreSQL.
 
-## Change Log
+### Authors
+- [Tammy Do](https://github.com/tammytdo)
+- [Andrea Riley(Thiel)](https://github.com/ariley215)
+- [Lana Zumbrunn](https://github.com/lana-z) 
 
 ## Links and Resources
 
-back-end server url
+For project info including features, acknowledgments, how to contribute and more, checkout the [Opensource Dashboard frontend repo readme](https://github.com/Open-Source-Dashboard/osd-frontend). 
 
-
-
-front-end application
 
 ## Setup
+To get a local copy up and running, follow these steps:
 
-.env requirements
+1. Clone the repository
+2. Navigate to the project directory
+3. Create and activate a virtual environment 
+    
+    `python3 -m venv .venv`
 
+    `source .venv/bin/activate` (Linux/Mac)
 
-PORT - Port Number
+    `source .venv/Scripts/activate` (Windows)
 
-DATABASE_URL 
+4. Install dependencies:
+`pip install -r requirements.txt`
 
-How to initialize/run your application 
-
-
-How to use your library 
-
-
+5. initialize/run the application 
+    
+    `python manage.py runserver`
