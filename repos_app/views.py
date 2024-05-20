@@ -33,7 +33,17 @@ class GitHubRepositoriesView(View):
         print(repo_data)
         return JsonResponse(repo_data, safe=True, status=200)
 
-    def github_repositories(request):
-        repositories = GithubRepo.objects.all()
-        serializer = GithubRepoSerializer(repositories, many=True)
-        return JsonResponse(serializer.data, safe=False)
+    def check_user_commits(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error: User not authenticated' }, status=401)
+        github_user = request.user
+        if not github_user.user_name:
+            return JsonResponse({'error: GitHub username not set'}, status=400)
+
+        repo_manager = GithubRepo.objects
+        has_user_commits = repo_manager.check_user_commits(github_user.user_name, github_user.registration_date)
+
+        if has_user_commits:
+            return JsonResponse({"message": "User has commits in the repositories"}, status=200)
+        else:
+            return JsonResponse({"message": "User has no commits in the repositories"}, status=200)
