@@ -13,24 +13,26 @@ class GithubRepoManager(models.Manager):
     """Fetch and process repositories from GitHub."""
 
     def fetch_repos(self):
-        last_month = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
-        url = 'https://api.github.com/search/repositories'
+        last_month = (datetime.now() - timedelta(days=30)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+        url = "https://api.github.com/search/repositories"
         headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
 
         params = {
             "q": f"topic:opensource hacktoberfest pushed:>{last_month}",
             "order": "desc",
             "sort": "updated",
-            "per_page": 20
+            "per_page": 20,
         }
 
         try:
-            response = requests.get(url,headers=headers, params=params)
+            response = requests.get(url, headers=headers, params=params)
             response.raise_for_status()
-            repositories = response.json()['items']
+            repositories = response.json()["items"]
             return repositories
         except requests.exceptions.RequestException as e:
-            print(f'Error fetching repositories: {str(e)}')
+            print(f"Error fetching repositories: {str(e)}")
             return []
 
     def get_popular_repos(self, repositories):
@@ -45,17 +47,26 @@ class GithubRepoManager(models.Manager):
         return [featured_repo]
 
     def prioritize_hacktoberfest_repos(self, repositories):
-        hacktoberfest_repos = [repo for repo in repositories if 'hacktoberfest' in repo['topics']]
-        other_repos = [repo for repo in repositories if 'hacktoberfest' not in repo['topics']]
+        hacktoberfest_repos = [
+            repo for repo in repositories if "hacktoberfest" in repo["topics"]
+        ]
+        other_repos = [
+            repo for repo in repositories if "hacktoberfest" not in repo["topics"]
+        ]
         return hacktoberfest_repos + other_repos
 
     def get_latest_contributors(self, repositories):
         """Get a list of latest contributors."""
 
-        calc_12_hours = (datetime.now() - timedelta(hours=12)).strftime("%Y-%m-%dT%H:%M:%SZ")
-        repos_last_12_hours = [repo for repo in repositories if repo['updated_at'] < calc_12_hours
+        calc_12_hours = (datetime.now() - timedelta(hours=12)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+        repos_last_12_hours = [
+            repo for repo in repositories if repo["updated_at"] < calc_12_hours
         ]
-        latest_commits_url_each_repo = [repo['commits_url'].split('{')[0] for repo in repos_last_12_hours]
+        latest_commits_url_each_repo = [
+            repo["commits_url"].split("{")[0] for repo in repos_last_12_hours
+        ]
 
         latest_commit_authors = []
         latest_repo_names = []
@@ -66,44 +77,62 @@ class GithubRepoManager(models.Manager):
 
             try:
                 if commits_response_json:
-                    latest_commit_author = commits_response_json[0].get('author', {}).get('login')
+                    latest_commit_author = (
+                        commits_response_json[0].get("author", {}).get("login")
+                    )
                     if latest_commit_author:
                         latest_commit_authors.append(latest_commit_author)
             except KeyError:
-                print('empty url', commits_response_json)
+                print("empty url", commits_response_json)
                 continue
-            repo_name = url.split('/')[-2]
+            repo_name = url.split("/")[-2]
             latest_repo_names.append(repo_name)
 
-        return [{"author": author, "repo_name": repo_name} for author, repo_name in zip(latest_commit_authors, latest_repo_names)]
+        return [
+            {"author": author, "repo_name": repo_name}
+            for author, repo_name in zip(latest_commit_authors, latest_repo_names)
+        ]
 
-    def check_user_commits(self, repositories, user_name, registration_date):    
-        commit_count = 0
-        has_user_commits = False
-        for repo in repositories:
-            commits_url = repo['commits_url'].split('{')[0]
+    def get_commits_sorted_by_date(self, username):
+        headers = {
+            "Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}",
+            "Accept": "application/vnd.github.cloak-preview",
+        }
+        params = {"q": f"author: {username} sort:author-date-desc "}
+
+        response = requests.get("https://api.github.com/search/commits", headers=headers, params=params)
+        if response == 200:
+            return response.json()['items']
+        else:
+            raise Exception(f'Query failed with status code: {response.status_code}')
             
-            try:
-                commits_response = requests.get(commits_url)
-                commits_response.raise_for_status()
-                commits = commits_response.json()
-                print('commits:', commits)
-                
-                for commit in commits:
-                    commit_author = commit.get('author', {}).get('login', {})
-                    commit_date = datetime.strptime(commit.get('commit', {}).get('author', {}).get('date', "%Y-%m-%dT%H:%M:%SZ"))
-                    if commit_author == user_name and commit_date > registration_date:
-                        commit_count += 1
-                        has_user_commits = True
-                        
-                    print('commit author', commit_author)
-                    print('commit date:', commit_date)
-                  
-                            
-            except requests.exceptions.RequestException as e:
-                print(f' Error fetching commits for repo {repo['name']}: {str(e)}')
-            
-        return has_user_commits, commit_count
+
+    # def check_user_commits(self, repositories, user_name, registration_date):
+    #     commit_count = 0
+    #     has_user_commits = False
+    #     for repo in repositories:
+    #         commits_url = repo['commits_url'].split('{')[0]
+
+    #         try:
+    #             commits_response = requests.get(commits_url)
+    #             commits_response.raise_for_status()
+    #             commits = commits_response.json()
+    #             print('commits:', commits)
+
+    #             for commit in commits:
+    #                 commit_author = commit.get('author', {}).get('login', {})
+    #                 commit_date = datetime.strptime(commit.get('commit', {}).get('author', {}).get('date', "%Y-%m-%dT%H:%M:%SZ"))
+    #                 if commit_author == user_name and commit_date > registration_date:
+    #                     commit_count += 1
+    #                     has_user_commits = True
+
+    #                 print('commit author', commit_author)
+    #                 print('commit date:', commit_date)
+
+    #         except requests.exceptions.RequestException as e:
+    #             print(f' Error fetching commits for repo {repo['name']}: {str(e)}')
+
+    #     return has_user_commits, commit_count
 
 
 # If performance becomes an issue, consider alternative methods to achieve randomness, such as selecting a random index in Python and retrieving the specific entry by ID.
@@ -117,13 +146,16 @@ class GithubRepo(models.Model):
     # avatar_url = models.URLField()
     commits_url = models.URLField()
     stargazers_count = models.IntegerField()
-    latest_commit_timestamp = models.DateTimeField(default=timezone.now, null=True, blank=True)
+    latest_commit_timestamp = models.DateTimeField(
+        default=timezone.now, null=True, blank=True
+    )
     latest_committer = models.CharField(max_length=255, null=True, blank=True)
 
     objects = GithubRepoManager()
 
     def __str__(self):
         return self.name
+
 
 class RepoContributor(models.Model):
     name = models.CharField(max_length=255)
