@@ -43,9 +43,12 @@ class GitHubRepositoriesView(View):
             return JsonResponse({'error: GitHub username not set'}, status=400)
 
         repo_manager = GithubRepo.objects
-        has_user_commits = repo_manager.check_user_commits(github_user.user_name, github_user.registration_date)
+        has_user_commits, commit_count = repo_manager.check_user_commits(github_user.user_name, github_user.registration_date)
+        
 
         if has_user_commits:
+            github_user.opensource_commit_count = commit_count
+            github_user.save()
             return JsonResponse({"message": "User has commits in the repositories"}, status=200)
         else:
             return JsonResponse({"message": "User has no commits in the repositories"}, status=200)

@@ -8,7 +8,6 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = GitHubUserSerializer
@@ -45,3 +44,9 @@ class CheckUserView(LoginRequiredMixin, View):
         is_new_user = not User.objects.filter(id=user_id).exists()
         return JsonResponse({'isNewUser': is_new_user})
 
+class UserCommitCountView(LoginRequiredMixin, View):
+    def get(self, request):
+        github_user = request.user
+        if not github_user.user_name:
+            return JsonResponse({"error": "GitHub username not set"}, status=400)
+        return JsonResponse({'commit_count': github_user.opensource_commit_count}, status=200)
