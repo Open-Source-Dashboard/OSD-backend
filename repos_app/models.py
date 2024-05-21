@@ -78,6 +78,8 @@ class GithubRepoManager(models.Manager):
         return [{"author": author, "repo_name": repo_name} for author, repo_name in zip(latest_commit_authors, latest_repo_names)]
 
     def check_user_commits(self, repositories, user_name, registration_date):    
+        commit_count = 0
+        has_user_commits = False
         for repo in repositories:
             commits_url = repo['commits_url'].split('{')[0]
             
@@ -91,7 +93,9 @@ class GithubRepoManager(models.Manager):
                     commit_author = commit.get('author', {}).get('login', {})
                     commit_date = datetime.strptime(commit.get('commit', {}).get('author', {}).get('date', "%Y-%m-%dT%H:%M:%SZ"))
                     if commit_author == user_name and commit_date > registration_date:
-                        return True
+                        commit_count += 1
+                        has_user_commits = True
+                        
                     print('commit author', commit_author)
                     print('commit date:', commit_date)
                   
@@ -99,7 +103,7 @@ class GithubRepoManager(models.Manager):
             except requests.exceptions.RequestException as e:
                 print(f' Error fetching commits for repo {repo['name']}: {str(e)}')
             
-        return False
+        return has_user_commits, commit_count
 
 
 # If performance becomes an issue, consider alternative methods to achieve randomness, such as selecting a random index in Python and retrieving the specific entry by ID.
