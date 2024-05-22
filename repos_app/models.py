@@ -20,7 +20,7 @@ class GithubRepoManager(models.Manager):
         headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
 
         params = {
-            "q": f"topic:opensource hacktoberfest pushed:>{last_month}",
+            "q": f"topic:opensource hacktoberfests pushed:>{last_month}",
             "order": "desc",
             "sort": "updated",
             "per_page": 20,
