@@ -20,7 +20,7 @@ class GithubRepoManager(models.Manager):
         headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
 
         params = {
-            "q": f"topic:opensource hacktoberfests pushed:>{last_month}",
+            "q": f"topic:opensource hacktoberfest pushed:>{last_month}",
             "order": "desc",
             "sort": "updated",
             "per_page": 20,
@@ -93,19 +93,20 @@ class GithubRepoManager(models.Manager):
             for author, repo_name in zip(latest_commit_authors, latest_repo_names)
         ]
 
-    def get_commits_sorted_by_date(self, username):
+    def get_user_commits(self, username="ariley215"):
         headers = {
             "Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}",
-            "Accept": "application/vnd.github.cloak-preview",
+            
         }
         params = {"q": f"author: {username} sort:author-date-desc "}
 
         response = requests.get("https://api.github.com/search/commits", headers=headers, params=params)
-        if response == 200:
+        print("commit response:", response)
+        if response.status_code == 200:
             return response.json()['items']
         else:
             raise Exception(f'Query failed with status code: {response.status_code}')
-            
+        
 
     # def check_user_commits(self, repositories, user_name, registration_date):
     #     commit_count = 0

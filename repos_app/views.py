@@ -10,8 +10,8 @@ class GitHubRepositoriesView(View):
     """A class-based view for retrieving GitHub repositories."""
 
     def get(self, request):
-        if 'check_user_commits' in request.GET:
-            return self.check_user_commits(request)
+        # if 'check_user_commits' in request.GET:
+        #     return self.check_user_commits(request)
         repositories = GithubRepo.objects.fetch_repos()
         if not repositories:
             return JsonResponse(
@@ -32,23 +32,32 @@ class GitHubRepositoriesView(View):
             "repositories": serialized_repos,
         }
 
-        print(repo_data)
+        # print(repo_data)
         return JsonResponse(repo_data, safe=True, status=200)
 
-    def check_user_commits(self, request):
-        if not request.user.is_authenticated:
-            return JsonResponse({'error: User not authenticated' }, status=401)
-        github_user = request.user
-        if not github_user.user_name:
-            return JsonResponse({'error: GitHub username not set'}, status=400)
+class GitHubUserContributionView(View):
+    def get(self, username):
+        commits = GithubRepo.objects.get_commits_sorted_by_date(username)
+        for commit in commits:
 
-        repo_manager = GithubRepo.objects
-        has_user_commits, commit_count = repo_manager.check_user_commits(github_user.user_name, github_user.registration_date)
-        
+            print(commits["commit"]["author"]["date"], commit["commit"]["message"])
+            return JsonResponse(commits["commit"]["author"]["date"], commit["commit"]["message"])
 
-        if has_user_commits:
-            github_user.opensource_commit_count = commit_count
-            github_user.save()
-            return JsonResponse({"message": "User has commits in the repositories"}, status=200)
-        else:
-            return JsonResponse({"message": "User has no commits in the repositories"}, status=200)
+        # TODO: send data to make the model
+
+    # def check_user_commits(self, request):
+    #     if not request.user.is_authenticated:
+    #         return JsonResponse({'error: User not authenticated' }, status=401)
+    #     github_user = request.user
+    #     if not github_user.user_name:
+    #         return JsonResponse({'error: GitHub username not set'}, status=400)
+
+    #     repo_manager = GithubRepo.objects
+    #     has_user_commits, commit_count = repo_manager.check_user_commits(github_user.user_name, github_user.registration_date)
+
+    #     if has_user_commits:
+    #         github_user.opensource_commit_count = commit_count
+    #         github_user.save()
+    #         return JsonResponse({"message": "User has commits in the repositories"}, status=200)
+    #     else:
+    #         return JsonResponse({"message": "User has no commits in the repositories"}, status=200)
