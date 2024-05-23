@@ -9,13 +9,13 @@ environ.Env.read_env()
 class GitHubUserManager(models.manager):
     """Fetch and process the users push events"""
 
-    def fetch_user_push_events(self, max_pages=5):
+    def fetch_user_push_events(self, user_name, max_pages=5):
         headers = {{"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}}
-        
+
         user_push_events = []
         for page in range(1, max_pages + 1):
             try:
-                response = requests.get(f'https://api.github.com/users/{user}/events', headers=headers)
+                response = requests.get(f'https://api.github.com/users/{user_name}/events', headers=headers)
                 response.raise_for_status()
                 user_events = response.json()
                 for event in user_events:
@@ -25,10 +25,15 @@ class GitHubUserManager(models.manager):
                 print(f"Error fetching repositories: {str(e)}")
                 return []
         return user_push_events
-    
+
     def commits_after_registration(registration_date, user_push_events):
-        
-            
+        commits = []
+        for event in user_push_events:
+            commit_date = datetime.strptime(event["created_at"], "%Y-%m-%dT%H:%M:%SZ")
+            if commit_date >= registration_date:
+                commits.append(event)
+        return commits
+
 
 class GitHubUser(AbstractUser):
     user_name = models.CharField(max_length=255, blank=True, null=True)
