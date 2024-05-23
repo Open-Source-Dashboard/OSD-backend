@@ -24,6 +24,7 @@ class GitHubUserManager(models.Manager):
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching repositories: {str(e)}")
                 return []
+        print(user_push_events)
         return user_push_events
 
     def events_after_registration(self, registration_date, user_push_events):
@@ -32,6 +33,7 @@ class GitHubUserManager(models.Manager):
             push_date = datetime.strptime(event["created_at"], "%Y-%m-%dT%H:%M:%SZ")
             if push_date >= registration_date:
                 after_registration_pushes.append(event)
+        print(after_registration_pushes)
         return after_registration_pushes
 
     def get_commits_from_push(self, after_registration_pushes):
@@ -44,6 +46,7 @@ class GitHubUserManager(models.Manager):
                     'url': commit['url'],
                     'author': commit['author']['name'],    
                 })
+        print(user_commits)
         return user_commits
 
 class GitHubUser(AbstractUser):

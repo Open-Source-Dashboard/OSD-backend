@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>User Push Events</title>
+</head>
+
+<body>
+    <h1>Push Events for {{ user.user_name }}</h1>
+    <h2>Total Commits: {{ total_commits }}</h2>
+
+    {% if commits %}
+    <ul>
+        {% for commit in commits %}
+        <li>
+            <strong>Commit SHA:</strong> {{ commit.sha }}<br>
+            <strong>Message:</strong> {{ commit.message }}<br>
+            <strong>URL:</strong> <a href="{{ commit.url }}">{{ commit.url }}</a><br>
+            <strong>Author Email:</strong> {{ commit.author.email }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No commits found since the registration date or an error occurred.</p>
+    {% endif %}
+</body>
+
+</html>

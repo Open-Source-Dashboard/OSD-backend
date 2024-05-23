@@ -19,13 +19,23 @@ class UserListView(generics.ListAPIView):
         return render(request, 'users_list.html', {'users': serializer.data})
 
 class UserDetailView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
+    queryset = GitHubUser.objects.all()
     serializer_class = GitHubUserSerializer
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return render(request, 'user_detail.html', {'user': serializer.data})
+        user = self.get_object()
+        serializer = self.get_serializer(user)
+        user_data = serializer.data
+
+        user_events = user.objects.fetch_user_push_events(user_data) 
+        after_registration_events = user.objects.events_after_registration(user.registration_date, user_events)
+        user_commits = user.objects.get_commits_from_push(after_registration_events)
+        
+        context = {
+            'user': user_data, 
+            'user commits': user_commits,
+        }
+        return render(request, 'user_detail.html', context)
 
     def github_repositories(request, username):
         url = f'https://api.github.com/users/{username}/repos'
@@ -38,24 +48,8 @@ class UserDetailView(generics.RetrieveAPIView):
             error_message = 'Failed to fetch repositories.'
             return render(request, 'github_repositories_error.html', {'error': error_message})
 
-
 class CheckUserView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user_id = request.GET.get('user_id')
         is_new_user = not User.objects.filter(id=user_id).exists()
         return JsonResponse({'isNewUser': is_new_user})
-
-class UserCommitView(View):
-    def get(self, request, user_id):
-        user_instance = get_object_or_404(GitHubUser, pk=user_id)
-        user_push_events = GitHubUser.objects.fetch_user_push_events(user_instance.user_name)
-        after_registration_pushes = GitHubUser.objects.after_registration_pushes(user_instance.registration_date, user_push_events)
-        commits = GitHubUser.objects.get_commits_from_push(after_registration_pushes)
-
-        commits = {
-            "total_commits": len(commits),
-            "commits": (commits),
-        }
-
-   
-        return JsonResponse(commits, status=200)

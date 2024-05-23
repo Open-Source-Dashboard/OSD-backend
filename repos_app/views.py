@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .models import GithubRepo
 from .serializers import GithubRepoSerializer
-from accounts.models import GitHubUser
+
 
 
 class GitHubRepositoriesView(View):
@@ -35,13 +35,13 @@ class GitHubRepositoriesView(View):
         # print(repo_data)
         return JsonResponse(repo_data, safe=True, status=200)
 
-class GitHubUserContributionView(View):
-    def get(self, username):
-        commits = GithubRepo.objects.get_commits_sorted_by_date(username)
-        for commit in commits:
+# class GitHubUserContributionView(View):
+#     def get(self, username):
+#         commits = GithubRepo.objects.get_commits_sorted_by_date(username)
+#         for commit in commits:
 
-            print(commits["commit"]["author"]["date"], commit["commit"]["message"])
-            return JsonResponse(commits["commit"]["author"]["date"], commit["commit"]["message"])
+#             print(commits["commit"]["author"]["date"], commit["commit"]["message"])
+#             return JsonResponse(commits["commit"]["author"]["date"], commit["commit"]["message"])
 
         # TODO: send data to make the model
 
