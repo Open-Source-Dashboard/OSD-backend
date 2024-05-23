@@ -1,11 +1,12 @@
 from django.contrib.auth.models import User 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
 from .serializers import GitHubUserSerializer
 import requests
 from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import GitHubUser
 
 
 class UserListView(generics.ListAPIView):
@@ -44,9 +45,17 @@ class CheckUserView(LoginRequiredMixin, View):
         is_new_user = not User.objects.filter(id=user_id).exists()
         return JsonResponse({'isNewUser': is_new_user})
 
-class UserCommitCountView(LoginRequiredMixin, View):
-    def get(self, request):
-        github_user = request.user
-        if not github_user.user_name:
-            return JsonResponse({"error": "GitHub username not set"}, status=400)
-        return JsonResponse({'commit_count': github_user.opensource_commit_count}, status=200)
+class UserCommitView(View):
+    def get(self, request, user_id):
+        user_instance = get_object_or_404(GitHubUser, pk=user_id)
+        user_push_events = GitHubUser.objects.fetch_user_push_events(user_instance.user_name)
+        after_registration_pushes = GitHubUser.objects.after_registration_pushes(user_instance.registration_date, user_push_events)
+        commits = GitHubUser.objects.get_commits_from_push(after_registration_pushes)
+
+        commits = {
+            "total_commits": len(commits),
+            "commits": (commits),
+        }
+
+   
+        return JsonResponse(commits, status=200)

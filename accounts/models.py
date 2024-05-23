@@ -6,7 +6,7 @@ import requests, environ
 
 env = environ.Env()
 environ.Env.read_env()
-class GitHubUserManager(models.manager):
+class GitHubUserManager(models.Manager):
     """Fetch and process the users push events"""
 
     def fetch_user_push_events(self, user_name, max_pages=5):
@@ -26,14 +26,25 @@ class GitHubUserManager(models.manager):
                 return []
         return user_push_events
 
-    def commits_after_registration(registration_date, user_push_events):
-        commits = []
+    def events_after_registration(self, registration_date, user_push_events):
+        after_registration_pushes = []
         for event in user_push_events:
-            commit_date = datetime.strptime(event["created_at"], "%Y-%m-%dT%H:%M:%SZ")
-            if commit_date >= registration_date:
-                commits.append(event)
-        return commits
+            push_date = datetime.strptime(event["created_at"], "%Y-%m-%dT%H:%M:%SZ")
+            if push_date >= registration_date:
+                after_registration_pushes.append(event)
+        return after_registration_pushes
 
+    def get_commits_from_push(self, after_registration_pushes):
+        user_commits = []
+        for push in after_registration_pushes:
+            for commit in push['payload']['commits']:
+                user_commits.append({
+                    'sha': commit['sha'],
+                    'message': commit['message'],
+                    'url': commit['url'],
+                    'author': commit['author']['name'],    
+                })
+        return user_commits
 
 class GitHubUser(AbstractUser):
     user_name = models.CharField(max_length=255, blank=True, null=True)

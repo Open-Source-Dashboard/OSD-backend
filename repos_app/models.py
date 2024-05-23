@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils import timezone
 from datetime import datetime, timedelta
 import requests, random, environ
-from accounts.models import GitHubUser
 
 env = environ.Env()
 environ.Env.read_env()
