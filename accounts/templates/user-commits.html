@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
 
-<head>
-    <title>User Push Events</title>
-</head>
 
-<body>
-    <h1>Push Events for {{ user.user_name }}</h1>
-    <h2>Total Commits: {{ total_commits }}</h2>
+    <h2>Push Events for {{ user.user_name }}</h2>
+    <h3>Total Commits: {{ total_commits }}</h3>
 
     {% if commits %}
     <ul>
@@ -23,6 +18,6 @@
     {% else %}
     <p>No commits found since the registration date or an error occurred.</p>
     {% endif %}
-</body>
+
 
 </html>

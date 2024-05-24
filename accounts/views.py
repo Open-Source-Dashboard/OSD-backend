@@ -16,7 +16,7 @@ class UserListView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
-        return render(request, 'users_list.html', {'users': serializer.data})
+        return JsonResponse({'users': serializer.data})
 
 class UserDetailView(generics.RetrieveAPIView):
     queryset = GitHubUser.objects.all()
@@ -26,27 +26,20 @@ class UserDetailView(generics.RetrieveAPIView):
         user = self.get_object()
         serializer = self.get_serializer(user)
         user_data = serializer.data
-
-        user_events = user.objects.fetch_user_push_events(user_data) 
-        after_registration_events = user.objects.events_after_registration(user.registration_date, user_events)
-        user_commits = user.objects.get_commits_from_push(after_registration_events)
+        print('user data:', user_data)
+        user_events = user.fetch_user_push_events(user.user_name) 
+        print('user events:', user_events)
+        after_registration_events = user.events_after_registration(user.registration_date, user_events)
+        print('after registration events:', after_registration_events)
+        user_commits = user.get_commits_from_push(after_registration_events)
+        print('User commits:', user_commits)
         
-        context = {
+        commit_data = {
             'user': user_data, 
             'user commits': user_commits,
         }
-        return render(request, 'user_detail.html', context)
+        return JsonResponse(commit_data)
 
-    def github_repositories(request, username):
-        url = f'https://api.github.com/users/{username}/repos'
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            repositories = response.json()
-            return render(request, 'github_repositories.html', {'repositories': repositories})
-        else:
-            error_message = 'Failed to fetch repositories.'
-            return render(request, 'github_repositories_error.html', {'error': error_message})
 
 class CheckUserView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
