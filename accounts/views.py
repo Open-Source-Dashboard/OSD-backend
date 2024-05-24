@@ -21,6 +21,7 @@ class UserListView(generics.ListAPIView):
 class UserDetailView(generics.RetrieveAPIView):
     queryset = GitHubUser.objects.all()
     serializer_class = GitHubUserSerializer
+    lookup_field = 'user_name'
 
     def retrieve(self, request, *args, **kwargs):
         user = self.get_object()

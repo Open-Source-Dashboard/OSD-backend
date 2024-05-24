@@ -9,7 +9,7 @@ environ.Env.read_env()
 class GitHubUserManager(models.Manager):
     """Fetch and process the users push events"""
 
-    def fetch_user_push_events(self, user_name, max_pages=5):
+    def fetch_user_push_events(self, user_name='ariley215', max_pages=5):
         headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
         url = f"https://api.github.com/users/{user_name}/events"
         user_push_events = []
@@ -30,8 +30,9 @@ class GitHubUserManager(models.Manager):
         print(user_push_events)
         return user_push_events
 
-    def events_after_registration(self, registration_date, user_push_events):
+    def events_after_registration(self, user_push_events):
         after_registration_pushes = []
+        registration_date = datetime(2023, 1, 1)
         for event in user_push_events:
             push_date = datetime.strptime(event["created_at"], "%Y-%m-%dT%H:%M:%SZ")
             if push_date >= registration_date:
