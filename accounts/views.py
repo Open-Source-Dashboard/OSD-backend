@@ -49,6 +49,7 @@ class UserDetailView(generics.RetrieveAPIView):
 
 class CheckUserView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
+        print('request from CheckUserView', request)
         user_id = request.GET.get('user_id')
         is_new_user = not User.objects.filter(id=user_id).exists()
         return JsonResponse({'isNewUser': is_new_user})
