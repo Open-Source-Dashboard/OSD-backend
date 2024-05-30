@@ -12,7 +12,7 @@ def get_github_username(user_access_token):
     try:
         response = requests.get(url, headers=headers)
         response_json = response.json()
-        print(response_json['login'])
+        print("username from frontend: ", response_json['login'])
         return response_json['login']
     except requests.exceptions.RequestException as e:
         print(f'Failed to fetch GitHub user: {e}')
