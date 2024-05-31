@@ -3,6 +3,7 @@ import requests
 from django.http import JsonResponse
 from django.views import View
 from .models import GitHubUser
+from django.forms.models import model_to_dict
 
 def get_github_username(user_access_token):
     url = 'https://api.github.com/user'
@@ -13,7 +14,7 @@ def get_github_username(user_access_token):
     try:
         response = requests.get(url, headers=headers)
         response_json = response.json()
-        print("username retrieved from github api using user_access_token: ", response_json['login'])
+        print("username from frontend: ", response_json['login'])
         return response_json['login']
     except requests.exceptions.RequestException as e:
         print(f'Failed to fetch GitHub user: {e}')
@@ -46,8 +47,14 @@ class GitHubAuthCallback(View):
         print('response_json request: ', response_json)
 
         if 'access_token' in response_json:
+            print('response_json', response_json)
+            github_username = get_github_username(response_json['access_token'])
             access_token = response_json['access_token']
-            github_username = get_github_username(access_token)
+            expires_in = response_json['expires_in']
+            refresh_token = response_json['refresh_token']
+            refresh_token_expires_in = response_json['refresh_token_expires_in']
+            token_type = response_json['token_type']
+            scope = response_json['scope']
             
             if github_username:
                 user, created = GitHubUser.objects.get_or_create(username=github_username)
@@ -55,7 +62,9 @@ class GitHubAuthCallback(View):
                     user.user_name = github_username
                 user.save()
                 
-                return JsonResponse({'github_username': github_username, 'access_token': access_token}, status=200)
+                user_model_data = model_to_dict(user)
+                
+                return JsonResponse({'github_username': github_username, 'access_token': access_token, 'user_model_data': user_model_data}, status=200)
             else:
                 return JsonResponse({'error': 'Failed to fetch GitHub username'}, status=400)
         else:
