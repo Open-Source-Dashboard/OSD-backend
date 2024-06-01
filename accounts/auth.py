@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.views import View
 from .models import GitHubUser
 from django.forms.models import model_to_dict
+from django.utils import timezone
 
 def get_github_username(user_access_token):
     url = 'https://api.github.com/user'
@@ -50,16 +51,15 @@ class GitHubAuthCallback(View):
             print('response_json', response_json)
             github_username = get_github_username(response_json['access_token'])
             access_token = response_json['access_token']
-            expires_in = response_json['expires_in']
-            refresh_token = response_json['refresh_token']
-            refresh_token_expires_in = response_json['refresh_token_expires_in']
-            token_type = response_json['token_type']
-            scope = response_json['scope']
             
             if github_username:
                 user, created = GitHubUser.objects.get_or_create(username=github_username)
+                
                 if created:
                     user.user_name = github_username
+                else:
+                    user.last_login = timezone.now()
+                
                 user.save()
                 
                 user_model_data = model_to_dict(user)
