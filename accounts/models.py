@@ -37,7 +37,6 @@ class GitHubUserManager(models.Manager):
             push_date = datetime.strptime(event["created_at"], "%Y-%m-%dT%H:%M:%SZ")
             if push_date >= registration_date:
                 after_registration_pushes.append(event)
-        print(after_registration_pushes)
         return after_registration_pushes
 
     def get_commits_from_push(self, after_registration_pushes):
