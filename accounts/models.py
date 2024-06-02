@@ -16,10 +16,10 @@ class GitHubUserManager(models.Manager):
         for page in range(1, max_pages + 1):
             try:
                 response = requests.get(url, headers=headers)
-                print('Fetching user events url', response)
+                print('*** Fetching user events url', response)
                 response.raise_for_status()
                 user_events = response.json()
-                print(user_events)
+                print('*** user_events', user_events)
                 for event in user_events:
                     if event['type'] == 'PushEvent':
                         user_push_events.append(event)
@@ -27,7 +27,7 @@ class GitHubUserManager(models.Manager):
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching repositories: {str(e)}")
                 return []
-        print(user_push_events)
+        print('*** user_push_events', user_push_events)
         return user_push_events
 
     def events_after_registration(self, user_push_events):
@@ -49,7 +49,7 @@ class GitHubUserManager(models.Manager):
                     'url': commit['url'],
                     'author': commit['author']['name'],    
                 })
-        print(user_commits)
+        print('*** user_commits', user_commits)
         return user_commits
 
 class GitHubUser(AbstractUser):

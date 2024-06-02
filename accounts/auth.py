@@ -15,16 +15,14 @@ def get_github_username(user_access_token):
     try:
         response = requests.get(url, headers=headers)
         response_json = response.json()
-        print("username from frontend: ", response_json['login'])
         return response_json['login']
     except requests.exceptions.RequestException as e:
         print(f'Failed to fetch GitHub user: {e}')
         return None
 
 class GitHubAuthCallback(View):
-    def get(self, request):
-        print('GitHubAuthCallback request: ', request)
 
+    def get(self, request):
         code = request.GET.get('code')
 
         client_id = os.getenv('GITHUB_CLIENT_ID')
@@ -36,7 +34,7 @@ class GitHubAuthCallback(View):
             'client_secret': client_secret,
             'code': code,
         }
-        print('data: ', data)
+        # print('*** data: ', data)
 
         headers = {
             'Accept': 'application/json',
@@ -45,10 +43,8 @@ class GitHubAuthCallback(View):
         response = requests.post(token_url, data=data, headers=headers)
         response_json = response.json()
         
-        print('response_json request: ', response_json)
-
         if 'access_token' in response_json:
-            print('response_json', response_json)
+            # print('*** response_json', response_json)
             github_username = get_github_username(response_json['access_token'])
             access_token = response_json['access_token']
             
@@ -57,8 +53,11 @@ class GitHubAuthCallback(View):
                 
                 if created:
                     user.user_name = github_username
+                    print('*** user created', user)
                 else:
                     user.last_login = timezone.now()
+                    #Do not edit this print statement to avoid errors related to printing timezone.now.
+                    print('*** user last_login updated', timezone.now()) 
                 
                 user.save()
                 

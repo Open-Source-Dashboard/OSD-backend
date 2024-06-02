@@ -43,7 +43,7 @@ class GitHubUserContributionView(View):
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             response_json = response.json()
-            print("username from frontend: ", response_json['login'])
+            # print("*** username from frontend: ", response_json['login'])
             return response_json['login']
         except requests.exceptions.RequestException as e:
             print(f'Failed to fetch GitHub user: {e}')
