@@ -69,7 +69,7 @@ class GitHubUserContributionView(View):
             'Authorization': f'Bearer {user_access_token}'
         }
         params = {
-            'per_page': 50,
+            'per_page': 1,
             'page': 1
         }
 
