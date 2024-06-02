@@ -2,9 +2,11 @@ import os
 import requests
 from django.http import JsonResponse
 from django.views import View
-from .models import GitHubUser
-from django.forms.models import model_to_dict
 from django.utils import timezone
+from accounts.models import GitHubUser
+from django.forms.models import model_to_dict
+from django.db.models import F
+from datetime import datetime
 
 def get_github_username(user_access_token):
     url = 'https://api.github.com/user'
@@ -14,6 +16,7 @@ def get_github_username(user_access_token):
 
     try:
         response = requests.get(url, headers=headers)
+        response.raise_for_status()
         response_json = response.json()
         return response_json['login']
     except requests.exceptions.RequestException as e:
@@ -34,17 +37,20 @@ class GitHubAuthCallback(View):
             'client_secret': client_secret,
             'code': code,
         }
-        # print('*** data: ', data)
 
         headers = {
             'Accept': 'application/json',
         }
 
-        response = requests.post(token_url, data=data, headers=headers)
-        response_json = response.json()
-        
+        try:
+            response = requests.post(token_url, data=data, headers=headers)
+            response.raise_for_status()
+            response_json = response.json()
+        except requests.exceptions.RequestException as e:
+            print(f'Failed to get access token: {e}')
+            return JsonResponse({'error': 'Failed to get access token'}, status=400)
+
         if 'access_token' in response_json:
-            # print('*** response_json', response_json)
             github_username = get_github_username(response_json['access_token'])
             access_token = response_json['access_token']
             
@@ -56,12 +62,18 @@ class GitHubAuthCallback(View):
                     print('*** user created', user)
                 else:
                     user.last_login = timezone.now()
-                    #Do not edit this print statement to avoid errors related to printing timezone.now.
-                    print('*** user last_login updated', timezone.now()) 
-                
+                    # Update opensource_commit_count using F expression and refresh the object
+                    GitHubUser.objects.filter(username=github_username).update(opensource_commit_count=F('opensource_commit_count') + 1)
+                    user.refresh_from_db()
+                    print('*** user last_login updated', timezone.now())
+                    print('*** user', user.github_username)
+                    print('*** user', user.opensource_commit_count)
                 user.save()
                 
                 user_model_data = model_to_dict(user)
+                # Convert datetime fields to strings
+                if 'last_login' in user_model_data:
+                    user_model_data['last_login'] = user_model_data['last_login'].isoformat()
                 
                 return JsonResponse({'github_username': github_username, 'access_token': access_token, 'user_model_data': user_model_data}, status=200)
             else:
