@@ -100,7 +100,7 @@ class GithubRepoManager(models.Manager):
         params = {"q": f"author: {username} sort:author-date-desc "}
 
         response = requests.get("https://api.github.com/search/commits", headers=headers, params=params)
-        print("commit response:", response)
+        print("*** commit response:", response)
         if response.status_code == 200:
             return response.json()['items']
         else:

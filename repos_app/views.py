@@ -4,7 +4,6 @@ from django.http import JsonResponse
 from .models import GithubRepo
 from .serializers import GithubRepoSerializer
 import requests
-# from .auth import get_github_username
 
 class GitHubRepositoriesView(View):
     """A class-based view for retrieving GitHub repositories."""
@@ -31,7 +30,6 @@ class GitHubRepositoriesView(View):
 
         return JsonResponse(repo_data, safe=True, status=200)
 
-
 class GitHubUserContributionView(View):
     """A class-based view for retrieving user contributions."""
     
@@ -45,10 +43,42 @@ class GitHubUserContributionView(View):
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             response_json = response.json()
-            print("username from frontend: ", response_json['login'])
+            # print("*** username from frontend: ", response_json['login'])
             return response_json['login']
         except requests.exceptions.RequestException as e:
             print(f'Failed to fetch GitHub user: {e}')
+            return None
+
+    def get_user_repositories(self, user_access_token):
+        url = 'https://api.github.com/user/repos'
+        headers = {
+            'Authorization': f'Bearer {user_access_token}'
+        }
+
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f'Failed to fetch user repositories: {e}')
+            return None
+
+    def get_repository_commits(self, owner, repo, user_access_token):
+        url = f'https://api.github.com/repos/{owner}/{repo}/commits'
+        headers = {
+            'Authorization': f'Bearer {user_access_token}'
+        }
+        params = {
+            'per_page': 1,
+            'page': 1
+        }
+
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f'Failed to fetch commits for {owner}/{repo}: {e}')
             return None
 
     def get(self, request):
@@ -64,21 +94,35 @@ class GitHubUserContributionView(View):
         if not username:
             return JsonResponse({'error': 'Failed to retrieve GitHub username'}, status=500)
 
-        try:
-            commits = GithubRepo.objects.get_user_commits(username)
-            print('** all commits: ', commits[1])
+        repositories = self.get_user_repositories(user_access_token)
+        if not repositories:
+            return JsonResponse({'error': 'Failed to retrieve user repositories'}, status=500)
 
-            user_contribution_data = [
-                {"date": commit["commit"]["author"]["date"], "message": commit["commit"]["message"]}
-                for commit in commits
-            ]
-            # print('** user_contribution_data', user_contribution_data)
+        user_contribution_data = []
 
-            # TODO: Sort the user_contribution_data before sending to the frontend
-            return JsonResponse(user_contribution_data, safe=False)
-        except Exception as e:
-            print('** exception occurred for user_contribution_data')
-            return JsonResponse({"error": str(e)}, status=400)
+        for repo in repositories:
+            owner = repo['owner']['login']
+            repo_name = repo['name']
+            commits = self.get_repository_commits(owner, repo_name, user_access_token)
+            if commits:
+                for commit in commits:
+                    user_contribution_data.append({
+                        "commit_date": commit["commit"]["author"]["date"],
+                        "commit_message": commit["commit"]["message"],
+                        "repository": {
+                            "repo_id": repo["id"],
+                            "repo_name": repo["name"],
+                            "repo_full_name": repo["full_name"],
+                            "repo_avatar_url": repo["owner"]["avatar_url"],
+                            "repo_html_url": repo["html_url"],
+                            "repo_labels_url": repo["labels_url"].replace('{/name}', ''),
+                        }
+                    })
+
+        # Sort commits by date in reverse chronological order
+        user_contribution_data.sort(key=lambda x: x["commit_date"], reverse=True)
+
+        return JsonResponse(user_contribution_data, safe=False, status=200)
 
     def check_user_commits(self, request):
         if not request.user.is_authenticated:
