@@ -111,6 +111,7 @@ class GitHubUserContributionView(View):
         try:
             github_user = GitHubUser.objects.get(github_username=github_username)
             last_login_time = github_user.last_login_date.replace(tzinfo=None)
+            print('*** last_login_time', github_user, last_login_time)
 
         except GitHubUser.DoesNotExist:
             return JsonResponse({'error': 'GitHub user not found'}, status=404)
@@ -121,13 +122,14 @@ class GitHubUserContributionView(View):
             commits = self.get_repository_commits(owner, repo_name, user_access_token)
             if commits:
                 for commit in commits:
-                    # print('*** Commit message:', commit['commit']['message'])
+                    print('*** Commit message:', commit['commit']['message'])
                     print('*** Commit date:', commit['commit']['author']['date'])
                     print('*** HTML URL:', commit['html_url'])
 
                     commit_date = datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ")
                     if commit_date > last_login_time:
                         new_commit_count += 1
+                        print('*** new_commit_count:', new_commit_count)
 
                     user_contribution_data.append({
                         "commit_date": commit["commit"]["author"]["date"],
@@ -155,12 +157,10 @@ class GitHubUserContributionView(View):
             GitHubUser.objects.filter(github_username=github_username).update(
                 opensource_commit_count=F('opensource_commit_count') + new_commit_count
             )
-
-            print('*** opensource_commit_count before increment:', github_user.opensource_commit_count)
-
-            print('*** check database for opensource_commit_count after increment.')
-
+            
             github_user = GitHubUser.objects.get(github_username=github_username)
+
+        # print('*** User contribution data', user_contribution_data)
 
         # Update the user's last login date to the current time
         github_user.last_login_date = timezone.now()

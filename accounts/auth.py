@@ -75,6 +75,7 @@ class GitHubAuthCallback(View):
                 if 'last_login' in user_model_data:
                     user_model_data['last_login'] = user_model_data['last_login'].isoformat()
                 
+                # TODO: remove github_username from response for security reasons
                 return JsonResponse({'github_username': github_username, 'access_token': access_token, 'user_model_data': user_model_data}, status=200)
             else:
                 return JsonResponse({'error': 'Failed to fetch GitHub github_username'}, status=400)
