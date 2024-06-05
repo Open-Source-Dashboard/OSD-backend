@@ -11,7 +11,7 @@ environ.Env.read_env()
 class GitHubUserManager(models.Manager):
     """Fetch and process the users push events"""
 
-    def fetch_user_push_events(self, user_name='ariley215', max_pages=5):
+    def fetch_user_push_events(self, user_name, max_pages=5):
         headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
         url = f"https://api.github.com/users/{user_name}/events"
         user_push_events = []
@@ -79,4 +79,4 @@ class GitHubUser(AbstractUser):
     objects = GitHubUserManager()
     
     def __str__(self):
-        return self.user_name
+        return self.github_username

@@ -92,7 +92,7 @@ class GithubRepoManager(models.Manager):
             for author, repo_name in zip(latest_commit_authors, latest_repo_names)
         ]
 
-    def get_user_commits(self, username="ariley215"):
+    def get_user_commits(self, username):
         headers = {
             "Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}",
             
