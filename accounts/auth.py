@@ -55,7 +55,7 @@ class GitHubAuthCallback(View):
             access_token = response_json['access_token']
             
             if github_username:
-                user, created = GitHubUser.objects.get_or_create(username=github_username)
+                user, created = GitHubUser.objects.get_or_create(github_username=github_username)
                 
                 if created:
                     user.user_name = github_username
@@ -63,7 +63,7 @@ class GitHubAuthCallback(View):
                 else:
                     user.last_login = timezone.now()
                     # Update opensource_commit_count using F expression and refresh the object
-                    GitHubUser.objects.filter(username=github_username).update(opensource_commit_count=F('opensource_commit_count') + 1)
+                    GitHubUser.objects.filter(github_username=github_username).update(opensource_commit_count=F('opensource_commit_count') + 1)
                     user.refresh_from_db()
                     print('*** user last_login updated', timezone.now())
                     print('*** user', user.github_username)
@@ -77,6 +77,6 @@ class GitHubAuthCallback(View):
                 
                 return JsonResponse({'github_username': github_username, 'access_token': access_token, 'user_model_data': user_model_data}, status=200)
             else:
-                return JsonResponse({'error': 'Failed to fetch GitHub username'}, status=400)
+                return JsonResponse({'error': 'Failed to fetch GitHub github_username'}, status=400)
         else:
             return JsonResponse({'error': 'Failed to get access token'}, status=400)
