@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
 from datetime import datetime
+from django.utils import timezone
+
 import requests, environ
 
 env = environ.Env()
@@ -55,7 +57,7 @@ class GitHubUserManager(models.Manager):
 class GitHubUser(AbstractUser):
     github_username = models.CharField(max_length=255, blank=True, null=True)
     registration_date = models.DateTimeField(auto_now_add=True)
-    last_login_date = models.DateTimeField(auto_now=True)
+    last_login_date = models.DateTimeField(default=timezone.now)
     last_commit_repo = models.CharField(max_length=255)
     opensource_commit_count = models.IntegerField(default=0)
 

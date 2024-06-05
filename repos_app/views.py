@@ -2,6 +2,8 @@ from django.views import View
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import GithubRepo
+from accounts.models import GitHubUser
+from datetime import datetime
 from .serializers import GithubRepoSerializer
 import requests
 
@@ -32,7 +34,6 @@ class GitHubRepositoriesView(View):
 
 class GitHubUserContributionView(View):
     """A class-based view for retrieving user contributions."""
-    
     def get_github_username(self, user_access_token):
         url = 'https://api.github.com/user'
         headers = {
@@ -43,7 +44,6 @@ class GitHubUserContributionView(View):
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             response_json = response.json()
-            # print("*** username from frontend: ", response_json['login'])
             return response_json['login']
         except requests.exceptions.RequestException as e:
             print(f'Failed to fetch GitHub user: {e}')
@@ -69,8 +69,7 @@ class GitHubUserContributionView(View):
             'Authorization': f'Bearer {user_access_token}'
         }
         params = {
-            'per_page': 1,
-            'page': 1
+            'per_page': 10 
         }
 
         try:
@@ -82,6 +81,7 @@ class GitHubUserContributionView(View):
             return None
 
     def get(self, request):
+
         user_access_token = request.headers.get('Authorization')
 
         if not user_access_token:
@@ -90,15 +90,25 @@ class GitHubUserContributionView(View):
         if user_access_token.startswith('Bearer '):
             user_access_token = user_access_token.split(' ')[1]
 
-        username = self.get_github_username(user_access_token)
-        if not username:
+        github_username = self.get_github_username(user_access_token)
+        if not github_username:
             return JsonResponse({'error': 'Failed to retrieve GitHub username'}, status=500)
 
         repositories = self.get_user_repositories(user_access_token)
         if not repositories:
             return JsonResponse({'error': 'Failed to retrieve user repositories'}, status=500)
 
+        # Initialize commit count
+        new_commit_count = 0
         user_contribution_data = []
+
+        # Fetch the user's last login time
+        try:
+            github_user = GitHubUser.objects.get(github_username=github_username)
+            last_login_time = github_user.last_login_date.replace(tzinfo=None)
+
+        except GitHubUser.DoesNotExist:
+            return JsonResponse({'error': 'GitHub user not found'}, status=404)
 
         for repo in repositories:
             owner = repo['owner']['login']
@@ -106,21 +116,36 @@ class GitHubUserContributionView(View):
             commits = self.get_repository_commits(owner, repo_name, user_access_token)
             if commits:
                 for commit in commits:
-                    user_contribution_data.append({
-                        "commit_date": commit["commit"]["author"]["date"],
-                        "commit_message": commit["commit"]["message"],
-                        "repository": {
-                            "repo_id": repo["id"],
-                            "repo_name": repo["name"],
-                            "repo_full_name": repo["full_name"],
-                            "repo_avatar_url": repo["owner"]["avatar_url"],
-                            "repo_html_url": repo["html_url"],
-                            "repo_labels_url": repo["labels_url"].replace('{/name}', ''),
-                        }
-                    })
+                    commit_date = commit["commit"]["author"]["date"]
+                    commit_datetime = datetime.strptime(commit_date, "%Y-%m-%dT%H:%M:%SZ")
+                    
+                    print('******** made it this far ******* ')
+                    print('*** commit datetime:', commit_date)
+                    print('*** last_login date:', last_login_time)
+
+                    if commit_datetime > last_login_time:
+                        new_commit_count += 1
+                        user_contribution_data.append({
+                            "commit_date": commit_date,
+                            "commit_message": commit["commit"]["message"],
+                            "repository": {
+                                "repo_id": repo["id"],
+                                "repo_name": repo["name"],
+                                "repo_full_name": repo["full_name"],
+                                "repo_avatar_url": repo["owner"]["avatar_url"],
+                                "repo_html_url": repo["html_url"],
+                                "repo_labels_url": repo["labels_url"].replace('{/name}', ''),
+                            }
+                        })
 
         # Sort commits by date in reverse chronological order
         user_contribution_data.sort(key=lambda x: x["commit_date"], reverse=True)
+
+        # Update the user's opensource_commit_count
+        if new_commit_count > 0:
+            GitHubUser.objects.filter(github_username=github_username).update(
+                opensource_commit_count=F('opensource_commit_count') + new_commit_count
+            )
 
         return JsonResponse(user_contribution_data, safe=False, status=200)
 
@@ -128,11 +153,11 @@ class GitHubUserContributionView(View):
         if not request.user.is_authenticated:
             return JsonResponse({'error': 'User not authenticated'}, status=401)
         github_user = request.user
-        if not github_user.user_name:
+        if not github_user.github_username:
             return JsonResponse({'error': 'GitHub username not set'}, status=400)
 
         repo_manager = GithubRepo.objects
-        has_user_commits, commit_count = repo_manager.check_user_commits(github_user.user_name, github_user.registration_date)
+        has_user_commits, commit_count = repo_manager.check_user_commits(github_user.github_username, github_user.registration_date)
 
         if has_user_commits:
             github_user.opensource_commit_count = commit_count
