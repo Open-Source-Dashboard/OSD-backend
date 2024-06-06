@@ -86,8 +86,9 @@ class GitHubUserContributionView(View):
             return None
 
     def get(self, request):
+        
         user_access_token = request.headers.get('Authorization')
-
+        
         if not user_access_token:
             return JsonResponse({'error': 'Access token not provided'}, status=400)
 
@@ -95,6 +96,7 @@ class GitHubUserContributionView(View):
             user_access_token = user_access_token.split(' ')[1]
 
         github_username = self.get_github_username(user_access_token)
+
         if not github_username:
             return JsonResponse({'error': 'Failed to retrieve GitHub username'}, status=500)
 
@@ -110,7 +112,7 @@ class GitHubUserContributionView(View):
          # Fetch the user's last login time
         try:
             github_user = GitHubUser.objects.get(github_username=github_username)
-            last_login_time = github_user.last_login_date.replace(tzinfo=None)
+            last_login_time = github_user.last_login.replace(tzinfo=None)
             print('*** last_login_time', github_user, last_login_time)
 
         except GitHubUser.DoesNotExist:
@@ -122,14 +124,15 @@ class GitHubUserContributionView(View):
             commits = self.get_repository_commits(owner, repo_name, user_access_token)
             if commits:
                 for commit in commits:
-                    print('*** Commit message:', commit['commit']['message'])
-                    print('*** Commit date:', commit['commit']['author']['date'])
-                    print('*** HTML URL:', commit['html_url'])
+                    # print('*** Commit message:', commit['commit']['message'])
+                    # print('*** Commit date:', commit['commit']['author']['date'])
+                    # print('*** HTML URL:', commit['html_url'])
 
                     commit_date = datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ")
                     if commit_date > last_login_time:
                         new_commit_count += 1
-                        print('*** new_commit_count:', new_commit_count)
+                        
+                        print('*** new_commit_count added')
 
                     user_contribution_data.append({
                         "commit_date": commit["commit"]["author"]["date"],
@@ -151,6 +154,7 @@ class GitHubUserContributionView(View):
         # print('*** User contribution data', user_contribution_data)
     
         # Update the user's opensource_commit_count
+        print('*** total new_commit_count', new_commit_count)
 
         if new_commit_count > 0:
             
@@ -163,7 +167,7 @@ class GitHubUserContributionView(View):
         # print('*** User contribution data', user_contribution_data)
 
         # Update the user's last login date to the current time
-        github_user.last_login_date = timezone.now()
+        github_user.last_login = timezone.now()
         github_user.save()
 
         return JsonResponse(user_contribution_data, safe=False, status=200)

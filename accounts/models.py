@@ -57,7 +57,7 @@ class GitHubUserManager(models.Manager):
 class GitHubUser(AbstractUser):
     github_username = models.CharField(max_length=255, blank=True, null=True)
     registration_date = models.DateTimeField(auto_now_add=True)
-    last_login_date = models.DateTimeField(default=timezone.now)
+    last_login = models.DateTimeField(default=timezone.now)
     last_commit_repo = models.CharField(max_length=255)
     opensource_commit_count = models.IntegerField(default=0)
 
