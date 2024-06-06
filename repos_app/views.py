@@ -68,27 +68,27 @@ class GitHubUserContributionView(View):
             return None
 
     def get_repository_commits(self, owner, repo, user_access_token):
+
+        # print('get_repository_commits function called\n')
+        
         url = f'https://api.github.com/repos/{owner}/{repo}/commits'
         headers = {
             'Authorization': f'Bearer {user_access_token}'
         }
-        params = {
-            'per_page': 1,
-            'page': 1
-        }
 
         try:
-            response = requests.get(url, headers=headers, params=params)
+            response = requests.get(url, headers=headers)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f'Failed to fetch commits for {owner}/{repo}: {e}')
             return None
 
+
     def get(self, request):
         
         user_access_token = request.headers.get('Authorization')
-        
+
         if not user_access_token:
             return JsonResponse({'error': 'Access token not provided'}, status=400)
 
@@ -101,39 +101,43 @@ class GitHubUserContributionView(View):
             return JsonResponse({'error': 'Failed to retrieve GitHub username'}, status=500)
 
         repositories = self.get_user_repositories(user_access_token)
+
         if not repositories:
             return JsonResponse({'error': 'Failed to retrieve user repositories'}, status=500)
 
         # Initialize commit count
         new_commit_count = 0
 
-        user_contribution_data = []
 
          # Fetch the user's last login time
         try:
             github_user = GitHubUser.objects.get(github_username=github_username)
             last_login_time = github_user.last_login.replace(tzinfo=None)
-            print('*** last_login_time', github_user, last_login_time)
+            print('*** last_login_time to OSD', github_user, last_login_time)
 
         except GitHubUser.DoesNotExist:
             return JsonResponse({'error': 'GitHub user not found'}, status=404)
 
+        user_contribution_data = []
+        
         for repo in repositories:
             owner = repo['owner']['login']
             repo_name = repo['name']
             commits = self.get_repository_commits(owner, repo_name, user_access_token)
             if commits:
-                for commit in commits:
-                    # print('*** Commit message:', commit['commit']['message'])
-                    # print('*** Commit date:', commit['commit']['author']['date'])
-                    # print('*** HTML URL:', commit['html_url'])
+                # Sort commits by date in reverse chronological order
+                commits.sort(key=lambda x: x["commit"]["author"]["date"], reverse=True)
 
+                print('\n*** Repo name:', repo_name)
+
+                for commit in commits:
                     commit_date = datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ")
+                    
+                    print('*** Commit date:', commit['commit']['author']['date'])
+
                     if commit_date > last_login_time:
                         new_commit_count += 1
-                        
-                        print('*** new_commit_count added')
-
+                                
                     user_contribution_data.append({
                         "commit_date": commit["commit"]["author"]["date"],
                         "commit_message": commit["commit"]["message"],
@@ -151,7 +155,7 @@ class GitHubUserContributionView(View):
         # TODO: Some commits are missing. Fix user_contribution_data variable.
         user_contribution_data.sort(key=lambda x: x["commit_date"], reverse=True)
 
-        # print('*** User contribution data', user_contribution_data)
+        # print('*** User contribution data', user_contribution_data[:3])
     
         # Update the user's opensource_commit_count
         print('*** total new_commit_count', new_commit_count)
@@ -166,7 +170,6 @@ class GitHubUserContributionView(View):
 
         # print('*** User contribution data', user_contribution_data)
 
-        # Update the user's last login date to the current time
         github_user.last_login = timezone.now()
         github_user.save()
 

@@ -62,16 +62,16 @@ class GitHubAuthCallback(View):
                     print('*** user created', user)
                 else:
                     user.last_login = timezone.now()
-                    # Update opensource_commit_count using F expression and refresh the object
-                    GitHubUser.objects.filter(github_username=github_username).update(opensource_commit_count=F('opensource_commit_count') + 1)
+
+                    # GitHubUser.objects.filter(github_username=github_username).update(opensource_commit_count=F('opensource_commit_count') + 1)
                     user.refresh_from_db()
-                    print('*** user last_login updated', timezone.now())
-                    print('*** user', user.github_username)
-                    print('*** user', user.opensource_commit_count)
+                    # print('*** user name', user.github_username)
+                    # print('*** user opensource_commit_count', user.opensource_commit_count)
+                    
                 user.save()
                 
                 user_model_data = model_to_dict(user)
-                # Convert datetime fields to strings
+
                 if 'last_login' in user_model_data:
                     user_model_data['last_login'] = user_model_data['last_login'].isoformat()
                 
