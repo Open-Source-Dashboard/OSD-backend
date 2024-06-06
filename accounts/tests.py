@@ -20,7 +20,7 @@ class GitHubUserTestCase(TestCase):
         # Check if the fields match the fixture data
         self.assertEqual(github_user.user_name, 'User One')
         self.assertEqual(str(github_user.registration_date), '2024-05-01 00:00:00+00:00')
-        self.assertEqual(str(github_user.last_login_date), '2024-05-04 08:30:00+00:00')
+        self.assertEqual(str(github_user.last_login), '2024-05-04 08:30:00+00:00')
         self.assertEqual(github_user.repos, 'https://github.com/user1')
         self.assertEqual(github_user.commits_url, 'https://api.github.com/user1/commits')
         self.assertEqual(github_user.last_commit_repo, 'Project A')

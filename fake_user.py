@@ -10,7 +10,7 @@ from accounts.models import GitHubUser
 fake_user = GitHubUser.objects.create(
     user_name="ariley215",
     registration_date=datetime.now() - timedelta(days=30),
-    last_login_date=datetime.now(),
+    last_login=datetime.now(),
     last_commit_repo="fake/repo",
     opensource_commit_count=5,
 )

@@ -5,7 +5,7 @@
     "fields": {                      
       "user_name": "User One",
       "registration_date": "2024-05-01T00:00:00Z",
-      "last_login_date": "2024-05-04T08:30:00Z",
+      "last_login": "2024-05-04T08:30:00Z",
       "repos": "https://github.com/user1",
       "commits_url": "https://api.github.com/user1/commits",
       "last_commit_repo": "Project A",

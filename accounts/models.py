@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.utils.translation import gettext_lazy as _
 from datetime import datetime
+from django.utils import timezone
+
 import requests, environ
 
 env = environ.Env()
@@ -9,7 +11,7 @@ environ.Env.read_env()
 class GitHubUserManager(models.Manager):
     """Fetch and process the users push events"""
 
-    def fetch_user_push_events(self, user_name='ariley215', max_pages=5):
+    def fetch_user_push_events(self, user_name, max_pages=5):
         headers = {"Authorization": f"Bearer {env('GITHUB_ORG_ACCESS_TOKEN')}"}
         url = f"https://api.github.com/users/{user_name}/events"
         user_push_events = []
@@ -55,9 +57,9 @@ class GitHubUserManager(models.Manager):
 class GitHubUser(AbstractUser):
     github_username = models.CharField(max_length=255, blank=True, null=True)
     registration_date = models.DateTimeField(auto_now_add=True)
-    last_login_date = models.DateTimeField(auto_now=True)
+    last_login = models.DateTimeField(default=timezone.now)
     last_commit_repo = models.CharField(max_length=255)
-    opensource_commit_count = models.IntegerField(default=0)
+    opensource_commit_count = models.IntegerField(default=1)
 
     groups = models.ManyToManyField(
         Group,
@@ -77,4 +79,4 @@ class GitHubUser(AbstractUser):
     objects = GitHubUserManager()
     
     def __str__(self):
-        return self.user_name
+        return self.github_username
