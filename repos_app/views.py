@@ -124,8 +124,8 @@ class GitHubUserContributionView(View):
             owner = repo['owner']['login']
             repo_name = repo['name']
             commits = self.get_repository_commits(owner, repo_name, user_access_token)
+
             if commits:
-                # Sort commits by date in reverse chronological order
                 commits.sort(key=lambda x: x["commit"]["author"]["date"], reverse=True)
 
                 print('\n*** Repo name:', repo_name)
@@ -133,8 +133,6 @@ class GitHubUserContributionView(View):
                 for commit in commits:
                     commit_date = datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ")
                     
-                    print('*** Commit date:', commit['commit']['author']['date'])
-
                     if commit_date > last_login_time:
                         new_commit_count += 1
                                 
@@ -151,14 +149,12 @@ class GitHubUserContributionView(View):
                         }
                     })
 
-        # Sort commits by date in reverse chronological order
-        # TODO: Some commits are missing. Fix user_contribution_data variable.
-        user_contribution_data.sort(key=lambda x: x["commit_date"], reverse=True)
+        user_contribution_data.sort(key=lambda x: x["commit_date"], reverse=True) # Keep this line to sort commits from newest to oldest
 
         # print('*** User contribution data', user_contribution_data[:3])
     
         # Update the user's opensource_commit_count
-        print('*** total new_commit_count', new_commit_count)
+        # print('*** total new_commit_count', new_commit_count)
 
         if new_commit_count > 0:
             
@@ -173,6 +169,8 @@ class GitHubUserContributionView(View):
         github_user.last_login = timezone.now()
         github_user.save()
 
+        # Not necessary to return the user_contribution_data. 
+        # This function should just update the opensource_contribution_data in the database. Another frontend axios call could retrieve the opensource_contribution_data from the database. 
         return JsonResponse(user_contribution_data, safe=False, status=200)
 
 
