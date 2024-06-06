@@ -128,13 +128,16 @@ class GitHubUserContributionView(View):
             if commits:
                 commits.sort(key=lambda x: x["commit"]["author"]["date"], reverse=True)
 
-                print('\n*** Repo name:', repo_name)
 
                 for commit in commits:
                     commit_date = datetime.strptime(commit["commit"]["author"]["date"], "%Y-%m-%dT%H:%M:%SZ")
                     
                     if commit_date > last_login_time:
                         new_commit_count += 1
+                        print('*** new_commit_count + 1!')
+                        print('*** Repo name:', repo_name)
+                        print("*** commit_date ", commit_date)
+                        print("*** commit_message ", commit["commit"]["message"])
                                 
                     user_contribution_data.append({
                         "commit_date": commit["commit"]["author"]["date"],
