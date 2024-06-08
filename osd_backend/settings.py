@@ -83,10 +83,23 @@ WSGI_APPLICATION = 'osd_backend.wsgi.app'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# sqlite database
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
+# PostgreSQL database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'osd_db',
+        'USER' : 'osd_user',
+        'PASSWORD' : 'osd_pw',
+        'HOST' : 'localhost',
+        'PORT' : '5432',
     }
 }
 
@@ -129,6 +142,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# For PostgreSQL
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = env.list('ALLOWED_ORIGINS')
