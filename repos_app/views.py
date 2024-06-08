@@ -112,6 +112,7 @@ class GitHubUserContributionView(View):
 
         user_contribution_data = []
 
+        # TODO: Revise user contribution so that only user-entered commit messages are accepted as new commits. Do not increment for a merge or unmerge event. 
         for event in events:
             if event['type'] == 'PushEvent':
                 for commit in event['payload']['commits']:
