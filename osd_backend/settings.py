@@ -20,13 +20,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = env.str("SECRET_KEY", default="your_default_secret_key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.vercel.app',
-]
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=['localhost', '127.0.0.1', '.vercel.app'])
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -81,27 +78,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'osd_backend.wsgi.app'
 
 # Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-# sqlite database
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-# PostgreSQL database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'osd_db',
-        'USER' : 'osd_user',
-        'PASSWORD' : 'osd_pw',
-        'HOST' : 'localhost',
-        'PORT' : '5432',
+        'NAME': env.str('DB_NAME'),
+        'USER': env.str('DB_USER'),
+        'PASSWORD': env.str('DB_PASSWORD'),
+        'HOST': env.str('DB_HOST'),
+        'PORT': env.str('DB_PORT'),
     }
 }
+
 
 
 # Password validation
