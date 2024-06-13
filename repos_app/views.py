@@ -30,7 +30,6 @@ class GitHubRepositoriesView(View):
             "popular_repos_result": popular_repo_result,
             "featured_repo_result": featured_repo_result,
             "latest_contributors_result": latest_contributors_result,
-            "repositories": serialized_repos,
         }
 
         return JsonResponse(repo_data, safe=True, status=200)
