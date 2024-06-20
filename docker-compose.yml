@@ -12,7 +12,7 @@ services:
       - DB_NAME=donutdashboard_db
       - DB_USER=donutdashboardusers
       - DB_PASSWORD=cfgrads24donut
-      - DB_HOST=db  # Use 'db' as the hostname for the database service in Docker Compose
+      - DB_HOST=db
       - DB_PORT=5432
 
   db:
