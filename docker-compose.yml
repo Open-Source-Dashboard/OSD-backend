@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=donutdashboard_db
+      - DB_USER=donutdashboardusers
+      - DB_PASSWORD=cfgrads24donut
+      - DB_HOST=db  # Use 'db' as the hostname for the database service in Docker Compose
+      - DB_PORT=5432
+
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=donutdashboard_db
+      - POSTGRES_USER=donutdashboardusers
+      - POSTGRES_PASSWORD=cfgrads24donut
+    ports:
+      - "5432:5432"
