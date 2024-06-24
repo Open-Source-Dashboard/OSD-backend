@@ -22,7 +22,7 @@ SECRET_KEY = env.str("SECRET_KEY", default="your_default_secret_key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=['localhost', '127.0.0.1', '.vercel.app'])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=['.netlify.app'])
 
 
 # Application definition
@@ -138,3 +138,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ALLOWED_ORIGINS = env.list('ALLOWED_ORIGINS')
 CORS_ALLOW_ALL_ORIGINS = env.bool('ALLOW_ALL_ORIGINS')
 CSRF_TRUSTED_ORIGINS = env.list('ALLOWED_ORIGINS')
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}
