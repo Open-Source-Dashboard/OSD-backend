@@ -1,14 +1,14 @@
 {
-    "builds": [
-        {
-            "src": "osd_backend/wsgi.py",
-            "use": "@vercel/python"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "osd_backend/wsgi.py"
-        }
-    ]
+  "builds": [
+    {
+      "src": "project/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "project/wsgi.py"
+    }
+  ]
 }
