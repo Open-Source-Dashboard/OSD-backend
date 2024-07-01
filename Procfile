@@ -1,1 +1,1 @@
-web: gunicorn osd_backend.wsgi
+web: gunicorn osd_backend.wsgi:app
