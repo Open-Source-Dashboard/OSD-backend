@@ -1,0 +1,1 @@
+web: gunicorn osd_backend.wsgi
