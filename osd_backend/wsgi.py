@@ -1,10 +1,10 @@
 """
-WSGI config for osd_backend project.
+WSGI config for project project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/2.2/howto/deployment/wsgi/
+https://docs.djangoproject.com/en/4.0/howto/deployment/wsgi/
 """
 
 import os
@@ -15,5 +15,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'osd_backend.settings')
 
 application = get_wsgi_application()
 
-#Vercel 
+# Vercel
 app = application
