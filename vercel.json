@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "builds": [
     {
       "src": "osd_backend/wsgi.py",
@@ -8,7 +9,13 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "osd_backend/wsgi.py"
+      "dest": "osd_backend/wsgi.py",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+      }
     }
   ]
 }
