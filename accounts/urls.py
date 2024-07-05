@@ -11,4 +11,5 @@ urlpatterns = [
     
     # GitHub OAuth callback endpoint
     path('github/callback/', GitHubAuthCallback.as_view(), name='github-callback'),
+    path('accounts/github/callback', GitHubAuthCallback.as_view(), name='github_callback_no_slash')
 ]
