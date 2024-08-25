@@ -1,6 +1,6 @@
 import os
 import environ
-import dj_database_url 
+# import dj_database_url 
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -81,9 +81,9 @@ DATABASES = {
     }
 }
 
-DATABASES = {
-'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'),conn_max_age=1800)
-}
+# DATABASES = {
+# 'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'),conn_max_age=1800)
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -114,9 +114,9 @@ STATIC_URL = '/static/'
 
 # For PostgreSQL
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
