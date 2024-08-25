@@ -1,5 +1,6 @@
 import os
 import environ
+import dj_database_url 
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -8,6 +9,7 @@ env = environ.Env(
     GITHUB_CLIENT_ID=(str, ''),
     GITHUB_CLIENT_SECRET=(str, ''),
     GITHUB_ORG_ACCESS_TOKEN=(str, ''),
+    DATABASE_URL=(str, ''),
 )
 environ.Env.read_env()
 
@@ -79,6 +81,10 @@ DATABASES = {
     }
 }
 
+DATABASES = {
+'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'),conn_max_age=1800)
+}
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -108,9 +114,9 @@ STATIC_URL = '/static/'
 
 # For PostgreSQL
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
