@@ -9,6 +9,7 @@ charset-normalizer==3.3.2
 cryptography==42.0.5
 dataclasses==0.6
 deprecation==2.1.0
+dj-database-url==2.2.0
 Django==4.2.11
 django-cors-headers==4.3.1
 django-environ==0.11.2
@@ -27,6 +28,7 @@ mccabe==0.7.0
 packaging==24.1
 pluggy==1.5.0
 postgrest-py==0.4.0
+psycopg2==2.9.9
 psycopg2-binary==2.9.9
 py==1.11.0
 pycodestyle==2.11.1
