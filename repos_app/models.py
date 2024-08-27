@@ -77,7 +77,7 @@ class GithubRepoManager(models.Manager):
             try:
                 if commits_response_json:
                     latest_commit_author = (
-                        commits_response_json[0].get("author", {}).get("login")
+                        commits_response_json[0].get("login", {})
                     )
                     if latest_commit_author:
                         latest_commit_authors.append(latest_commit_author)
