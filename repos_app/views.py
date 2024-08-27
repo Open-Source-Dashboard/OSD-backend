@@ -24,8 +24,6 @@ class GitHubRepositoriesView(View):
         popular_repo_result = GithubRepo.objects.get_popular_repos(repositories)
         featured_repo_result = GithubRepo.objects.get_featured_repo(popular_repo_result)
         latest_contributors_result = GithubRepo.objects.get_latest_contributors(repositories)
-        print('**** latest_contributors_result', latest_contributors_result)
-        # serialized_repos = GithubRepoSerializer(repositories, many=True).data
 
         repo_data = {
             "popular_repos_result": popular_repo_result,

@@ -59,15 +59,10 @@ class GitHubAuthCallback(View):
                 
                 if created:
                     user.user_name = github_username
-                    print('*** user created', user)
                 else:
                     user.last_login = timezone.now()
-
-                    # GitHubUser.objects.filter(github_username=github_username).update(opensource_commit_count=F('opensource_commit_count') + 1)
                     user.refresh_from_db()
-                    # print('*** user name', user.github_username)
-                    # print('*** user opensource_commit_count', user.opensource_commit_count)
-                    
+
                 user.save()
                 
                 user_model_data = model_to_dict(user)

@@ -74,8 +74,6 @@ class GithubRepoManager(models.Manager):
             commits_response = requests.get(url)
             commits_response_json = commits_response.json()
             
-            print('*** commits_response_json', commits_response_json)
-
             try:
                 if commits_response_json:
                     latest_commit_author = (
@@ -97,8 +95,6 @@ class GithubRepoManager(models.Manager):
             for author, repo_name in zip(latest_commit_authors, latest_repo_names)
         ]
 
-        print('*** data', data)
-
         return data
 
     def get_user_commits(self, username):
@@ -109,7 +105,7 @@ class GithubRepoManager(models.Manager):
         params = {"q": f"author: {username} sort:author-date-desc "}
 
         response = requests.get("https://api.github.com/search/commits", headers=headers, params=params)
-        print("*** commit response:", response)
+
         if response.status_code == 200:
             return response.json()['items']
         else:
