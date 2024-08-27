@@ -56,12 +56,12 @@ class GithubRepoManager(models.Manager):
 
     def get_latest_contributors(self, repositories):
         """Get a list of latest contributors."""
-
+        
         calc_12_hours = (datetime.now() - timedelta(hours=12)).strftime(
             "%Y-%m-%dT%H:%M:%SZ"
         )
         repos_last_12_hours = [
-            repo for repo in repositories if repo["updated_at"] < calc_12_hours
+            repo for repo in repositories if repo["updated_at"] > calc_12_hours
         ]
         latest_commits_url_each_repo = [
             repo["commits_url"].split("{")[0] for repo in repos_last_12_hours
@@ -73,24 +73,33 @@ class GithubRepoManager(models.Manager):
         for url in latest_commits_url_each_repo:
             commits_response = requests.get(url)
             commits_response_json = commits_response.json()
+            
+            print('*** commits_response_json', commits_response_json)
 
             try:
                 if commits_response_json:
                     latest_commit_author = (
-                        commits_response_json[0].get("author", {}).get("login")
+                        commits_response_json[0].get("commit", {})
+                        .get("author", {})
+                        .get("name", "")
                     )
                     if latest_commit_author:
                         latest_commit_authors.append(latest_commit_author)
-            except KeyError:
-                print("empty url", commits_response_json)
+            except (KeyError, IndexError) as e:
+                print("Error parsing response:", e, commits_response_json)
                 continue
+
             repo_name = url.split("/")[-2]
             latest_repo_names.append(repo_name)
 
-        return [
+        data = [
             {"author": author, "repo_name": repo_name}
             for author, repo_name in zip(latest_commit_authors, latest_repo_names)
         ]
+
+        print('*** data', data)
+
+        return data
 
     def get_user_commits(self, username):
         headers = {

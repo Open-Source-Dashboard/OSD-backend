@@ -85,6 +85,12 @@ class GitHubUser(AbstractUser):
 
     objects = GitHubUserManager()
 
+    def save(self, *args, **kwargs):
+        if not self.username:
+            # Ensure username is populated or derived from github_username
+            self.username = self.github_username or "default_username"
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.github_username or self.username
 
